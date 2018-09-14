@@ -127,13 +127,20 @@ namespace EduSearch_Information_System
             }
         }
 
-
-
+        public static void printList(List<string> L)
+        {
+            foreach (string item in L)
+            {
+                Console.WriteLine(item+"\n------------------------------------------------------------------------------------------------");
+            }
+        }
 
         static void Main(string[] args)
         {
 //------------------------------------FETCHING COLLECTION AND POPULATING INDEX----------------------------------------------------------------
             string collectionPath  = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..")) + @"\resources\crandocs";
+
+            List<string> infoNeed = new List<string>();
 
 
             string indexPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..")) + @"\index";
@@ -143,7 +150,7 @@ namespace EduSearch_Information_System
 
             myLuceneApp.CreateIndex();
 
-            System.Console.WriteLine("Adding Collection to Index");
+            System.Console.WriteLine("Adding Collection to Index\n");
 
             myLuceneApp.IndexCollection();
 
@@ -156,34 +163,29 @@ namespace EduSearch_Information_System
 
 //--------------------------------------------READING INFORMATION NEEDS---------------------------------------------------------------
             string infoNeedPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..")) + @"\resources\cran_information_needs.txt";
-            string infoNeed = FileRead.FileRead.ReadFile(infoNeedPath);
+            string infoNeedWhole = FileRead.FileRead.ReadFile(infoNeedPath);
 
             //extract information needs into an array
             string pattern = @"(.D)\n([\w\W]+?).I ([0-9]{3})";
-            Regex re1 = new Regex(pattern);
-            Match match = Regex.Match(infoNeed, pattern);
-            int i = 1;
-            foreach (Group group in match.Groups)
+            MatchCollection matches = Regex.Matches(infoNeedWhole, pattern);
+            foreach (Match match in matches)
             {
-                Console.WriteLine("Group"+ i.ToString() + group.ToString()+"\n");
-                i++;
+                infoNeed.Add(match.Groups[2].ToString());
             }
-            Console.WriteLine(match.Groups);
 
+            
+             //add the last information need
             string lastMatchPattern = @"[\s\S]+\.D\n([\s\S]+)";
-            Regex re2 = new Regex(lastMatchPattern);
-            Match lastMatch = Regex.Match(infoNeed, lastMatchPattern);
+            Match lastMatch = Regex.Match(infoNeedWhole, lastMatchPattern);
+            infoNeed.Add(lastMatch.Groups[1].ToString());
 
+            Console.WriteLine("Printing Information needs:\n-------------------------------------------------------------------");
+            printList(infoNeed);
 
 
             myLuceneApp.CreateSearcher();
             myLuceneApp.CreateParser();
 
-            // Activity 6
-            myLuceneApp.SearchIndex("\nworld");
-
-            // Activity  7
-            myLuceneApp.DisplayResults(myLuceneApp.SearchIndex("\nworld"));
 
             myLuceneApp.CleanUpSearch();
             System.Console.ReadLine();
