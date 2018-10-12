@@ -39,7 +39,7 @@ namespace EduSearch_Information_System
         {
             luceneIndexDirectory = Lucene.Net.Store.FSDirectory.Open(this.indexPath);
             //analyzer = new Lucene.Net.Analysis.Standard.StandardAnalyzer(VERSION);
-            analyzer = new Lucene.Net.Analysis.Snowball.SnowballAnalyzer(VERSION, "English");
+            analyzer = new Lucene.Net.Analysis.SimpleAnalyzer();
             IndexWriter.MaxFieldLength mfl = new IndexWriter.MaxFieldLength(IndexWriter.DEFAULT_MAX_FIELD_LENGTH);
             writer = new Lucene.Net.Index.IndexWriter(luceneIndexDirectory, analyzer, true, mfl);
 

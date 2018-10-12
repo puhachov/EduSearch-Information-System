@@ -5,6 +5,9 @@ using static EduSearch_Information_System.LuceneApp;
 using Lucene.Net.Search; // for IndexSearcher
 using System.Text.RegularExpressions;
 using static FileReadProcess;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 
 
@@ -25,6 +28,11 @@ namespace EduSearch_Information_System
     {
         static void Main(string[] args)
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
+
+            /*
             // initialization
 
             //to store information needs
@@ -64,11 +72,11 @@ namespace EduSearch_Information_System
 
             myLuceneApp.CleanUpSearch();
             System.Console.ReadLine();
-
+            */
 
         }
     }
 
-        
-    
+
+
 }
