@@ -24,6 +24,18 @@ namespace EduSearch_Information_System
 
         const Lucene.Net.Util.Version VERSION = Lucene.Net.Util.Version.LUCENE_30;
         const string TEXT_FN = "Text";
+        private readonly string[] STOP_WORDS = new string[]{ "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
+            "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't",
+            "cannot", "could", "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few",
+            "for", "from", "further", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's", "her",
+            "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in",
+            "into", "is", "isn't", "it", "it's", "its", "itself", "let's", "me", "more", "most", "mustn't", "my", "myself", "no", "nor",
+            "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours	ourselves", "out", "over", "own", "same",
+            "shan't", "she", "she'd", "she'll", "she's", "should", "shouldn't", "so", "some", "such", "than", "that", "that's", "the",
+            "their", "theirs", "them", "themselves", "then", "there", "there's", "these", "they", "they'd", "they'll", "they're", "they've",
+            "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "wasn't", "we", "we'd", "we'll", "we're",
+            "we've", "were", "weren't", "what", "what's", "when", "when's", "where", "where's", "which", "while", "who", "who's", "whom",
+            "why", "why's", "with", "won't", "would", "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves" };
 
         public LuceneApp()
         {
@@ -38,12 +50,11 @@ namespace EduSearch_Information_System
 
         public void CreateIndex(string collectionPath, string indexPath)
         {
-
+            HashSet<string> stopWordsSet = new HashSet<string>(STOP_WORDS);
             this.indexPath = indexPath;
             this.collectionPath = collectionPath;
-            luceneIndexDirectory = Lucene.Net.Store.FSDirectory.Open(this.indexPath);
-            //analyzer = new Lucene.Net.Analysis.Standard.StandardAnalyzer(VERSION);
-            analyzer = new Lucene.Net.Analysis.SimpleAnalyzer();
+            luceneIndexDirectory = Lucene.Net.Store.FSDirectory.Open(this.indexPath);                        
+            analyzer = new Lucene.Net.Analysis.Standard.StandardAnalyzer(VERSION,stopWordsSet);
             IndexWriter.MaxFieldLength mfl = new IndexWriter.MaxFieldLength(IndexWriter.DEFAULT_MAX_FIELD_LENGTH);
             writer = new Lucene.Net.Index.IndexWriter(luceneIndexDirectory, analyzer, true, mfl);
 
@@ -56,6 +67,8 @@ namespace EduSearch_Information_System
             List<string> docs = new List<string>();
             DirectoryInfo d = new DirectoryInfo(this.collectionPath);//Assuming Test is your Folder
             FileInfo[] Files = d.GetFiles("*.txt"); //Getting Text files
+            
+
             foreach (FileInfo file in Files)
             {
                 string content = File.ReadAllText(file.FullName);
@@ -69,11 +82,18 @@ namespace EduSearch_Information_System
             List<string> docs = createDocumentsList();
             foreach (string text in docs)
             {
+
+                TextReader reader = new StringReader(text);
+                Lucene.Net.Analysis.NGram.NGramTokenizer tokeniser = new Lucene.Net.Analysis.NGram.NGramTokenizer(reader, 2, 2);
+
+                //TODO: use tokeniser to create index
+
                 Lucene.Net.Documents.Field field = new Field(TEXT_FN, text, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
                 Lucene.Net.Documents.Document doc = new Document();
                 doc.Add(field);
                 writer.AddDocument(doc);
             }
+            CleanUpIndexer();
         }
 
         public void CleanUpIndexer()

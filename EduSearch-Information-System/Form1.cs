@@ -49,7 +49,7 @@ namespace EduSearch_Information_System
             System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
             luceneApp.CreateIndex(collectionLoc, indexLoc);
             watch.Stop();
-            long elapsedS = watch.ElapsedMilliseconds / 1000;
+            float elapsedS = watch.ElapsedMilliseconds / (float)1000.00;
 
             lblIndexInformation.Text = String.Format("Index of {0} documents created in {1} seconds",luceneApp.GetIndexSize(),elapsedS);
 
