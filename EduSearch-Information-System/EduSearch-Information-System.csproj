@@ -53,7 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NGramTokenizer.cs" />
+    <Compile Include="ShingleFilter.cs" />
+    <Compile Include="ShingleAnalyzerWrapper.cs" />
     <Compile Include="LuceneApp.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

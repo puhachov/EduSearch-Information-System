@@ -48,6 +48,8 @@ namespace EduSearch_Information_System
             lblIndexFeedback.Text = "Creating index";
             System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
             luceneApp.CreateIndex(collectionLoc, indexLoc);
+            luceneApp.CreateSearcher();
+            luceneApp.CreateParser();
             watch.Stop();
             float elapsedS = watch.ElapsedMilliseconds / (float)1000.00;
 
@@ -58,9 +60,14 @@ namespace EduSearch_Information_System
         }
 
         private void btnSimpleSearch_Click(object sender, EventArgs e)
-        {
-            var searchText = txtSimpleSearch.Text;
+        {            
 
+            string searchText = txtSimpleSearch.Text;
+
+            Lucene.Net.Search.TopDocs results = luceneApp.SearchIndex(searchText);
+            luceneApp.DisplayResults(results);
+
+            /*
             labelTermSearch.Text = searchText;
             listView1.Clear();
 
@@ -72,6 +79,7 @@ namespace EduSearch_Information_System
             Console.WriteLine("Writing {0} results over {1} page", totalResults, totalPages);
 
             changePage(1);
+            */
         }
 
         private void displayPage(int page) {
