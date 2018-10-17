@@ -26,6 +26,7 @@ namespace EduSearch_Information_System
    
     class InformationRetrievalSystem
     {
+        [STAThread]
         static void Main(string[] args)
         {
             Application.EnableVisualStyles();

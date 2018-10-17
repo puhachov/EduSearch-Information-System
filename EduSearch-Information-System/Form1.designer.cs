@@ -38,25 +38,19 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.tabMultiPhraseSearch = new System.Windows.Forms.TabPage();
-            this.label10 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
+            this.lblMPTitle = new System.Windows.Forms.Label();
+            this.btnMPSaveResults = new System.Windows.Forms.Button();
+            this.lblMPSearchOptions = new System.Windows.Forms.Label();
+            this.lblMPPagination = new System.Windows.Forms.Label();
+            this.btnMPPaginationNext = new System.Windows.Forms.Button();
+            this.btnMPPaginationPrev = new System.Windows.Forms.Button();
+            this.lblMPSearchInfo = new System.Windows.Forms.Label();
             this.listView2 = new System.Windows.Forms.ListView();
-            this.button4 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.btnMPSearch = new System.Windows.Forms.Button();
+            this.txtBoxMPSearchInput = new System.Windows.Forms.TextBox();
             this.tabSimpleSearch = new System.Windows.Forms.TabPage();
             this.labelTermSearch = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
+            this.lblSearchTitle = new System.Windows.Forms.Label();
             this.btnSaveResults = new System.Windows.Forms.Button();
             this.lblSearchOptionsTitle = new System.Windows.Forms.Label();
             this.lblPaginationDisplay = new System.Windows.Forms.Label();
@@ -68,6 +62,11 @@
             this.btnSimpleSearch = new System.Windows.Forms.Button();
             this.txtSimpleSearch = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
+            this.lblIndexLocation = new System.Windows.Forms.Label();
+            this.lblCollectionLocation = new System.Windows.Forms.Label();
+            this.lblIndexInfoTitle = new System.Windows.Forms.Label();
+            this.lblIndexInformation = new System.Windows.Forms.Label();
             this.groupBoxIndexSelection.SuspendLayout();
             this.tabMultiPhraseSearch.SuspendLayout();
             this.tabSimpleSearch.SuspendLayout();
@@ -76,13 +75,15 @@
             // 
             // groupBoxIndexSelection
             // 
+            this.groupBoxIndexSelection.Controls.Add(this.lblCollectionLocation);
+            this.groupBoxIndexSelection.Controls.Add(this.lblIndexLocation);
             this.groupBoxIndexSelection.Controls.Add(this.btnIndexAccept);
             this.groupBoxIndexSelection.Controls.Add(this.lblIndexFeedback);
             this.groupBoxIndexSelection.Controls.Add(this.lblCollectionLoc);
             this.groupBoxIndexSelection.Controls.Add(this.btnCollectionLoc);
             this.groupBoxIndexSelection.Controls.Add(this.lblIndexLoc);
             this.groupBoxIndexSelection.Controls.Add(this.btnIndexLoc);
-            this.groupBoxIndexSelection.Location = new System.Drawing.Point(166, 211);
+            this.groupBoxIndexSelection.Location = new System.Drawing.Point(0, 0);
             this.groupBoxIndexSelection.Name = "groupBoxIndexSelection";
             this.groupBoxIndexSelection.Size = new System.Drawing.Size(530, 160);
             this.groupBoxIndexSelection.TabIndex = 8;
@@ -91,7 +92,7 @@
             // 
             // btnIndexAccept
             // 
-            this.btnIndexAccept.Location = new System.Drawing.Point(194, 101);
+            this.btnIndexAccept.Location = new System.Drawing.Point(210, 131);
             this.btnIndexAccept.Name = "btnIndexAccept";
             this.btnIndexAccept.Size = new System.Drawing.Size(113, 23);
             this.btnIndexAccept.TabIndex = 9;
@@ -102,10 +103,11 @@
             // lblIndexFeedback
             // 
             this.lblIndexFeedback.AutoSize = true;
-            this.lblIndexFeedback.Location = new System.Drawing.Point(92, 80);
+            this.lblIndexFeedback.Location = new System.Drawing.Point(272, 106);
             this.lblIndexFeedback.Name = "lblIndexFeedback";
             this.lblIndexFeedback.Size = new System.Drawing.Size(0, 13);
             this.lblIndexFeedback.TabIndex = 8;
+            this.lblIndexFeedback.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblCollectionLoc
             // 
@@ -118,17 +120,18 @@
             // 
             // btnCollectionLoc
             // 
-            this.btnCollectionLoc.Location = new System.Drawing.Point(6, 35);
+            this.btnCollectionLoc.Location = new System.Drawing.Point(30, 35);
             this.btnCollectionLoc.Name = "btnCollectionLoc";
             this.btnCollectionLoc.Size = new System.Drawing.Size(113, 23);
             this.btnCollectionLoc.TabIndex = 4;
             this.btnCollectionLoc.Text = "Browse";
             this.btnCollectionLoc.UseVisualStyleBackColor = true;
+            this.btnCollectionLoc.Click += new System.EventHandler(this.btnCollectionLoc_Click);
             // 
             // lblIndexLoc
             // 
             this.lblIndexLoc.AutoSize = true;
-            this.lblIndexLoc.Location = new System.Drawing.Point(279, 16);
+            this.lblIndexLoc.Location = new System.Drawing.Point(374, 19);
             this.lblIndexLoc.Name = "lblIndexLoc";
             this.lblIndexLoc.Size = new System.Drawing.Size(150, 13);
             this.lblIndexLoc.TabIndex = 6;
@@ -136,156 +139,98 @@
             // 
             // btnIndexLoc
             // 
-            this.btnIndexLoc.Location = new System.Drawing.Point(282, 35);
+            this.btnIndexLoc.Location = new System.Drawing.Point(396, 35);
             this.btnIndexLoc.Name = "btnIndexLoc";
             this.btnIndexLoc.Size = new System.Drawing.Size(113, 23);
             this.btnIndexLoc.TabIndex = 3;
             this.btnIndexLoc.Text = "Browse";
             this.btnIndexLoc.UseVisualStyleBackColor = true;
+            this.btnIndexLoc.Click += new System.EventHandler(this.btnIndexLoc_Click);
             // 
             // tabMultiPhraseSearch
             // 
-            this.tabMultiPhraseSearch.Controls.Add(this.label10);
-            this.tabMultiPhraseSearch.Controls.Add(this.button1);
-            this.tabMultiPhraseSearch.Controls.Add(this.label1);
-            this.tabMultiPhraseSearch.Controls.Add(this.label2);
-            this.tabMultiPhraseSearch.Controls.Add(this.label3);
-            this.tabMultiPhraseSearch.Controls.Add(this.label4);
-            this.tabMultiPhraseSearch.Controls.Add(this.label5);
-            this.tabMultiPhraseSearch.Controls.Add(this.label6);
-            this.tabMultiPhraseSearch.Controls.Add(this.button2);
-            this.tabMultiPhraseSearch.Controls.Add(this.button3);
-            this.tabMultiPhraseSearch.Controls.Add(this.label7);
-            this.tabMultiPhraseSearch.Controls.Add(this.label8);
-            this.tabMultiPhraseSearch.Controls.Add(this.label9);
+            this.tabMultiPhraseSearch.Controls.Add(this.lblMPTitle);
+            this.tabMultiPhraseSearch.Controls.Add(this.btnMPSaveResults);
+            this.tabMultiPhraseSearch.Controls.Add(this.lblMPSearchOptions);
+            this.tabMultiPhraseSearch.Controls.Add(this.lblMPPagination);
+            this.tabMultiPhraseSearch.Controls.Add(this.btnMPPaginationNext);
+            this.tabMultiPhraseSearch.Controls.Add(this.btnMPPaginationPrev);
+            this.tabMultiPhraseSearch.Controls.Add(this.lblMPSearchInfo);
             this.tabMultiPhraseSearch.Controls.Add(this.listView2);
-            this.tabMultiPhraseSearch.Controls.Add(this.button4);
-            this.tabMultiPhraseSearch.Controls.Add(this.textBox1);
+            this.tabMultiPhraseSearch.Controls.Add(this.btnMPSearch);
+            this.tabMultiPhraseSearch.Controls.Add(this.txtBoxMPSearchInput);
             this.tabMultiPhraseSearch.Location = new System.Drawing.Point(4, 22);
             this.tabMultiPhraseSearch.Name = "tabMultiPhraseSearch";
-            this.tabMultiPhraseSearch.Size = new System.Drawing.Size(903, 574);
+            this.tabMultiPhraseSearch.Size = new System.Drawing.Size(1097, 790);
             this.tabMultiPhraseSearch.TabIndex = 2;
             this.tabMultiPhraseSearch.Text = "Multi-Phrase Search";
             this.tabMultiPhraseSearch.UseVisualStyleBackColor = true;
             // 
-            // label10
+            // lblMPTitle
             // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 18.25F);
-            this.label10.Location = new System.Drawing.Point(89, 29);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(180, 29);
-            this.label10.TabIndex = 30;
-            this.label10.Text = "Phrase Search";
-            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblMPTitle.AutoSize = true;
+            this.lblMPTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 18.25F);
+            this.lblMPTitle.Location = new System.Drawing.Point(89, 29);
+            this.lblMPTitle.Name = "lblMPTitle";
+            this.lblMPTitle.Size = new System.Drawing.Size(180, 29);
+            this.lblMPTitle.TabIndex = 30;
+            this.lblMPTitle.Text = "Phrase Search";
+            this.lblMPTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // button1
+            // btnMPSaveResults
             // 
-            this.button1.Location = new System.Drawing.Point(15, 534);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(101, 23);
-            this.button1.TabIndex = 29;
-            this.button1.Text = "Save Results";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnMPSaveResults.Location = new System.Drawing.Point(15, 534);
+            this.btnMPSaveResults.Name = "btnMPSaveResults";
+            this.btnMPSaveResults.Size = new System.Drawing.Size(101, 23);
+            this.btnMPSaveResults.TabIndex = 29;
+            this.btnMPSaveResults.Text = "Save Results";
+            this.btnMPSaveResults.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // lblMPSearchOptions
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(130, 483);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(80, 13);
-            this.label1.TabIndex = 28;
-            this.label1.Text = "Search Options";
+            this.lblMPSearchOptions.AutoSize = true;
+            this.lblMPSearchOptions.Location = new System.Drawing.Point(130, 483);
+            this.lblMPSearchOptions.Name = "lblMPSearchOptions";
+            this.lblMPSearchOptions.Size = new System.Drawing.Size(80, 13);
+            this.lblMPSearchOptions.TabIndex = 28;
+            this.lblMPSearchOptions.Text = "Search Options";
             // 
-            // label2
+            // lblMPPagination
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(372, 70);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(46, 13);
-            this.label2.TabIndex = 27;
-            this.label2.Text = "Abstract";
+            this.lblMPPagination.AutoSize = true;
+            this.lblMPPagination.Location = new System.Drawing.Point(573, 539);
+            this.lblMPPagination.Name = "lblMPPagination";
+            this.lblMPPagination.Size = new System.Drawing.Size(96, 13);
+            this.lblMPPagination.TabIndex = 23;
+            this.lblMPPagination.Text = "Results 1..10 of 50";
             // 
-            // label3
+            // btnMPPaginationNext
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(538, 45);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(88, 13);
-            this.label3.TabIndex = 26;
-            this.label3.Text = "Bibliographic Info";
+            this.btnMPPaginationNext.Location = new System.Drawing.Point(804, 534);
+            this.btnMPPaginationNext.Name = "btnMPPaginationNext";
+            this.btnMPPaginationNext.Size = new System.Drawing.Size(75, 23);
+            this.btnMPPaginationNext.TabIndex = 22;
+            this.btnMPPaginationNext.Text = "Next";
+            this.btnMPPaginationNext.UseVisualStyleBackColor = true;
             // 
-            // label4
+            // btnMPPaginationPrev
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(448, 45);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(38, 13);
-            this.label4.TabIndex = 25;
-            this.label4.Text = "Author";
+            this.btnMPPaginationPrev.Location = new System.Drawing.Point(372, 534);
+            this.btnMPPaginationPrev.Name = "btnMPPaginationPrev";
+            this.btnMPPaginationPrev.Size = new System.Drawing.Size(75, 23);
+            this.btnMPPaginationPrev.TabIndex = 21;
+            this.btnMPPaginationPrev.Text = "Previous";
+            this.btnMPPaginationPrev.UseVisualStyleBackColor = true;
+            this.btnMPPaginationPrev.Visible = false;
             // 
-            // label5
+            // lblMPSearchInfo
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(372, 45);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(27, 13);
-            this.label5.TabIndex = 24;
-            this.label5.Text = "Title";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(573, 539);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(96, 13);
-            this.label6.TabIndex = 23;
-            this.label6.Text = "Results 1..10 of 50";
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(804, 534);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 22;
-            this.button2.Text = "Next";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(372, 534);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 21;
-            this.button3.Text = "Previous";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Visible = false;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(369, 17);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(0, 13);
-            this.label7.TabIndex = 20;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(12, 184);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(104, 13);
-            this.label8.TabIndex = 19;
-            this.label8.Text = "No search submitted";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(15, 154);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(218, 13);
-            this.label9.TabIndex = 18;
-            this.label9.Text = "Current results are for a processed search of:";
+            this.lblMPSearchInfo.AutoSize = true;
+            this.lblMPSearchInfo.Location = new System.Drawing.Point(15, 154);
+            this.lblMPSearchInfo.Name = "lblMPSearchInfo";
+            this.lblMPSearchInfo.Size = new System.Drawing.Size(218, 13);
+            this.lblMPSearchInfo.TabIndex = 18;
+            this.lblMPSearchInfo.Text = "Current results are for a processed search of:";
             // 
             // listView2
             // 
@@ -295,26 +240,28 @@
             this.listView2.TabIndex = 17;
             this.listView2.UseCompatibleStateImageBehavior = false;
             // 
-            // button4
+            // btnMPSearch
             // 
-            this.button4.Location = new System.Drawing.Point(180, 110);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(174, 23);
-            this.button4.TabIndex = 16;
-            this.button4.Text = "Search";
-            this.button4.UseVisualStyleBackColor = true;
+            this.btnMPSearch.Location = new System.Drawing.Point(180, 110);
+            this.btnMPSearch.Name = "btnMPSearch";
+            this.btnMPSearch.Size = new System.Drawing.Size(174, 23);
+            this.btnMPSearch.TabIndex = 16;
+            this.btnMPSearch.Text = "Search";
+            this.btnMPSearch.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // txtBoxMPSearchInput
             // 
-            this.textBox1.Location = new System.Drawing.Point(15, 84);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(339, 20);
-            this.textBox1.TabIndex = 15;
+            this.txtBoxMPSearchInput.Location = new System.Drawing.Point(15, 84);
+            this.txtBoxMPSearchInput.Name = "txtBoxMPSearchInput";
+            this.txtBoxMPSearchInput.Size = new System.Drawing.Size(339, 20);
+            this.txtBoxMPSearchInput.TabIndex = 15;
             // 
             // tabSimpleSearch
             // 
+            this.tabSimpleSearch.Controls.Add(this.lblIndexInformation);
+            this.tabSimpleSearch.Controls.Add(this.lblIndexInfoTitle);
             this.tabSimpleSearch.Controls.Add(this.labelTermSearch);
-            this.tabSimpleSearch.Controls.Add(this.label11);
+            this.tabSimpleSearch.Controls.Add(this.lblSearchTitle);
             this.tabSimpleSearch.Controls.Add(this.btnSaveResults);
             this.tabSimpleSearch.Controls.Add(this.lblSearchOptionsTitle);
             this.tabSimpleSearch.Controls.Add(this.lblPaginationDisplay);
@@ -341,16 +288,16 @@
             this.labelTermSearch.Size = new System.Drawing.Size(0, 13);
             this.labelTermSearch.TabIndex = 16;
             // 
-            // label11
+            // lblSearchTitle
             // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 18.25F);
-            this.label11.Location = new System.Drawing.Point(83, 29);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(159, 29);
-            this.label11.TabIndex = 15;
-            this.label11.Text = "Term Search";
-            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblSearchTitle.AutoSize = true;
+            this.lblSearchTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 18.25F);
+            this.lblSearchTitle.Location = new System.Drawing.Point(83, 29);
+            this.lblSearchTitle.Name = "lblSearchTitle";
+            this.lblSearchTitle.Size = new System.Drawing.Size(159, 29);
+            this.lblSearchTitle.TabIndex = 15;
+            this.lblSearchTitle.Text = "Term Search";
+            this.lblSearchTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnSaveResults
             // 
@@ -448,20 +395,55 @@
             // 
             this.tabControl1.Controls.Add(this.tabSimpleSearch);
             this.tabControl1.Controls.Add(this.tabMultiPhraseSearch);
-            this.tabControl1.Location = new System.Drawing.Point(12, 10);
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1105, 816);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.Visible = false;
             // 
+            // lblIndexLocation
+            // 
+            this.lblIndexLocation.AutoSize = true;
+            this.lblIndexLocation.Location = new System.Drawing.Point(512, 61);
+            this.lblIndexLocation.Name = "lblIndexLocation";
+            this.lblIndexLocation.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.lblIndexLocation.Size = new System.Drawing.Size(0, 13);
+            this.lblIndexLocation.TabIndex = 11;
+            // 
+            // lblCollectionLocation
+            // 
+            this.lblCollectionLocation.AutoSize = true;
+            this.lblCollectionLocation.Location = new System.Drawing.Point(30, 65);
+            this.lblCollectionLocation.Name = "lblCollectionLocation";
+            this.lblCollectionLocation.Size = new System.Drawing.Size(0, 13);
+            this.lblCollectionLocation.TabIndex = 12;
+            // 
+            // lblIndexInfoTitle
+            // 
+            this.lblIndexInfoTitle.AutoSize = true;
+            this.lblIndexInfoTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblIndexInfoTitle.Location = new System.Drawing.Point(15, 230);
+            this.lblIndexInfoTitle.Name = "lblIndexInfoTitle";
+            this.lblIndexInfoTitle.Size = new System.Drawing.Size(171, 24);
+            this.lblIndexInfoTitle.TabIndex = 17;
+            this.lblIndexInfoTitle.Text = "Index Information";
+            // 
+            // lblIndexInformation
+            // 
+            this.lblIndexInformation.AutoSize = true;
+            this.lblIndexInformation.Location = new System.Drawing.Point(19, 258);
+            this.lblIndexInformation.Name = "lblIndexInformation";
+            this.lblIndexInformation.Size = new System.Drawing.Size(0, 13);
+            this.lblIndexInformation.TabIndex = 18;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1129, 838);
-            this.Controls.Add(this.groupBoxIndexSelection);
             this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.groupBoxIndexSelection);
             this.Name = "Form1";
             this.Text = "Form1";
             this.groupBoxIndexSelection.ResumeLayout(false);
@@ -486,21 +468,15 @@
         private System.Windows.Forms.Button btnIndexAccept;
         private System.Windows.Forms.Label lblIndexFeedback;
         private System.Windows.Forms.TabPage tabMultiPhraseSearch;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button btnMPSaveResults;
+        private System.Windows.Forms.Label lblMPSearchOptions;
+        private System.Windows.Forms.Label lblMPPagination;
+        private System.Windows.Forms.Button btnMPPaginationNext;
+        private System.Windows.Forms.Button btnMPPaginationPrev;
+        private System.Windows.Forms.Label lblMPSearchInfo;
         private System.Windows.Forms.ListView listView2;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button btnMPSearch;
+        private System.Windows.Forms.TextBox txtBoxMPSearchInput;
         private System.Windows.Forms.TabPage tabSimpleSearch;
         private System.Windows.Forms.Button btnSaveResults;
         private System.Windows.Forms.Label lblSearchOptionsTitle;
@@ -513,9 +489,14 @@
         private System.Windows.Forms.Button btnSimpleSearch;
         private System.Windows.Forms.TextBox txtSimpleSearch;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label lblMPTitle;
+        private System.Windows.Forms.Label lblSearchTitle;
         private System.Windows.Forms.Label labelTermSearch;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog2;
+        private System.Windows.Forms.Label lblIndexLocation;
+        private System.Windows.Forms.Label lblCollectionLocation;
+        private System.Windows.Forms.Label lblIndexInformation;
+        private System.Windows.Forms.Label lblIndexInfoTitle;
     }
 }
 

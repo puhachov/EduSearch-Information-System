@@ -17,8 +17,11 @@ namespace EduSearch_Information_System
         int resultsPerPage;
         int totalResults;
         int totalPages;
+        private bool indexLocationSelected = false;
+        private bool collectionLocationSelected = false;
         Dictionary<string, Control>[] currentPageResults;
         Dictionary<string, string>[] searchResults;
+        LuceneApp luceneApp;
 
 
         public Form1()
@@ -26,10 +29,30 @@ namespace EduSearch_Information_System
             InitializeComponent();
             currentPage = 1;
             resultsPerPage = 10;
+            luceneApp = new LuceneApp();
         }
 
         private void btnIndexAccept_Click(object sender, EventArgs e)
         {
+            if (indexLocationSelected && collectionLocationSelected)
+            {
+                createIndex(lblCollectionLocation.Text, lblIndexLocation.Text);
+            }
+            else
+            {
+                lblIndexFeedback.Text = "Please select index and collection locations before attempting to create the index";
+            }
+        }
+
+        private void createIndex(string collectionLoc, string indexLoc) {
+            lblIndexFeedback.Text = "Creating index";
+            System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+            luceneApp.CreateIndex(collectionLoc, indexLoc);
+            watch.Stop();
+            long elapsedS = watch.ElapsedMilliseconds / 1000;
+
+            lblIndexInformation.Text = String.Format("Index of {0} documents created in {1} seconds",luceneApp.GetIndexSize(),elapsedS);
+
             groupBoxIndexSelection.Hide();
             tabControl1.Show();
         }
@@ -158,6 +181,20 @@ namespace EduSearch_Information_System
             newPage = newPage > 0 ? newPage - 1 : 0;
             lblPaginationDisplay.Text = String.Format("Results {0} .. {1} of {2}",((newPage * resultsPerPage)+1),limitToRange(newPage * resultsPerPage + resultsPerPage,totalResults,1),totalResults);
             lblPaginationDisplay.Show();
+        }
+
+        private void btnCollectionLoc_Click(object sender, EventArgs e)
+        {
+            folderBrowserDialog1.ShowDialog();
+            lblCollectionLocation.Text = folderBrowserDialog1.SelectedPath;
+            collectionLocationSelected = true;
+        }
+
+        private void btnIndexLoc_Click(object sender, EventArgs e)
+        {
+            folderBrowserDialog1.ShowDialog();
+            lblIndexLocation.Text = folderBrowserDialog1.SelectedPath;
+            indexLocationSelected = true;
         }
     }
 }

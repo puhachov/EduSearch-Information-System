@@ -25,23 +25,29 @@ namespace EduSearch_Information_System
         const Lucene.Net.Util.Version VERSION = Lucene.Net.Util.Version.LUCENE_30;
         const string TEXT_FN = "Text";
 
-        public LuceneApp(string collectionPath, string indexPath)
+        public LuceneApp()
         {
-            this.indexPath = indexPath;
-            this.collectionPath = collectionPath;
             luceneIndexDirectory = null;
             analyzer = null;
             writer = null;
         }
 
+        public int GetIndexSize() {            
+            return writer.MaxDoc();
+        }
 
-        public void CreateIndex()
+        public void CreateIndex(string collectionPath, string indexPath)
         {
+
+            this.indexPath = indexPath;
+            this.collectionPath = collectionPath;
             luceneIndexDirectory = Lucene.Net.Store.FSDirectory.Open(this.indexPath);
             //analyzer = new Lucene.Net.Analysis.Standard.StandardAnalyzer(VERSION);
             analyzer = new Lucene.Net.Analysis.SimpleAnalyzer();
             IndexWriter.MaxFieldLength mfl = new IndexWriter.MaxFieldLength(IndexWriter.DEFAULT_MAX_FIELD_LENGTH);
             writer = new Lucene.Net.Index.IndexWriter(luceneIndexDirectory, analyzer, true, mfl);
+
+            IndexCollection();
 
         }
 
