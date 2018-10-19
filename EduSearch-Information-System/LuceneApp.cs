@@ -62,9 +62,9 @@ namespace EduSearch_Information_System
             this.indexPath = indexPath;
             this.collectionPath = collectionPath;
 
-            luceneIndexDirectory = Lucene.Net.Store.FSDirectory.Open(this.indexPath);      
-                              
-            analyzer = new Lucene.Net.Analysis.Standard.StandardAnalyzer(VERSION, stopWordsSet);
+            luceneIndexDirectory = Lucene.Net.Store.FSDirectory.Open(this.indexPath);
+
+            analyzer = new Lucene.Net.Analysis.Snowball.SnowballAnalyzer(VERSION, "English", stopWordsSet);
             shingleAnalyzer = new Lucene.Net.Analysis.Shingle.ShingleAnalyzerWrapper(analyzer, MAX_SHINGLE_SIZE);
 
             IndexWriter.MaxFieldLength mfl = new IndexWriter.MaxFieldLength(IndexWriter.DEFAULT_MAX_FIELD_LENGTH);
