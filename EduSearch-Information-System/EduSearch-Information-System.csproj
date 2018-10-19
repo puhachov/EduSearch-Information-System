@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="StandardAnalyzer.cs" />
     <Compile Include="ShingleFilter.cs" />
     <Compile Include="ShingleAnalyzerWrapper.cs" />
     <Compile Include="LuceneApp.cs" />

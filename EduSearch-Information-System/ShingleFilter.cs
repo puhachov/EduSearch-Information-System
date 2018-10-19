@@ -59,7 +59,7 @@ namespace Lucene.Net.Analysis.Shingle
         public const String TOKEN_SEPARATOR = " ";
 
         /*
-         * By default, we output unigrams (individual tokens) as well as shingles
+         * Altered this so that only ngrams are output to index as unigrams have already been indexed
          * (token n-grams).
          */
         private bool outputUnigrams = true;
@@ -269,7 +269,7 @@ namespace Lucene.Net.Analysis.Shingle
                     numFillerTokensToInsert--;
                     // A filler token occupies no space
                     offsetAtt.SetOffset(offsetAtt.StartOffset, offsetAtt.StartOffset);
-                    termAtt.SetTermBuffer(FILLER_TOKEN, 0, 0);
+                    termAtt.SetTermBuffer(FILLER_TOKEN, 0, FILLER_TOKEN.Length);
                     return true;
                 }
 

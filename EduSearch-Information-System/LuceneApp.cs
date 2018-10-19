@@ -24,6 +24,7 @@ namespace EduSearch_Information_System
         public string collectionPath { get; set; }
 
         const Lucene.Net.Util.Version VERSION = Lucene.Net.Util.Version.LUCENE_30;
+        const int MAX_SHINGLE_SIZE = 2;
         const string TEXT_FN = "Text";
         private readonly string[] STOP_WORDS = new string[]{ "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
             "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't",
@@ -63,8 +64,8 @@ namespace EduSearch_Information_System
 
             luceneIndexDirectory = Lucene.Net.Store.FSDirectory.Open(this.indexPath);      
                               
-            analyzer = new Lucene.Net.Analysis.Standard.StandardAnalyzer(VERSION,stopWordsSet);
-            shingleAnalyzer = new Lucene.Net.Analysis.Shingle.ShingleAnalyzerWrapper(analyzer);
+            analyzer = new Lucene.Net.Analysis.Standard.StandardAnalyzer(VERSION, stopWordsSet);
+            shingleAnalyzer = new Lucene.Net.Analysis.Shingle.ShingleAnalyzerWrapper(analyzer, MAX_SHINGLE_SIZE);
 
             IndexWriter.MaxFieldLength mfl = new IndexWriter.MaxFieldLength(IndexWriter.DEFAULT_MAX_FIELD_LENGTH);
             writer = new Lucene.Net.Index.IndexWriter(luceneIndexDirectory, shingleAnalyzer, true, mfl);
