@@ -56,8 +56,7 @@ namespace EduSearch_Information_System
             return writer.MaxDoc();
         }
 
-        public void CreateIndex(string collectionPath, string indexPath)
-        {
+        public void CreateIndex(string collectionPath, string indexPath){
             HashSet<string> stopWordsSet = new HashSet<string>(STOP_WORDS);
             this.indexPath = indexPath;
             this.collectionPath = collectionPath;
