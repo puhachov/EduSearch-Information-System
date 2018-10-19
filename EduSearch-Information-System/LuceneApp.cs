@@ -25,7 +25,12 @@ namespace EduSearch_Information_System
 
         const Lucene.Net.Util.Version VERSION = Lucene.Net.Util.Version.LUCENE_30;
         const int MAX_SHINGLE_SIZE = 2;
-        const string TEXT_FN = "Text";
+        const string DOC_TITLE = "Title";
+        const string DOC_AUTHOR = "Author";
+        const string DOC_BIB = "Bibliography";
+        const string DOC_BODY = "Body";
+        const string DOC_ID = "ID";
+
         private readonly string[] STOP_WORDS = new string[]{ "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
             "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't",
             "cannot", "could", "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few",
@@ -74,9 +79,9 @@ namespace EduSearch_Information_System
 
         }
 
-        private List<string> createDocumentsList()
+        private List<Dictionary<string,string>> createDocumentsList()
         {
-            List<string> docs = new List<string>();
+            List<Dictionary<string,string>> docs = new List<Dictionary<string, string>>();
             DirectoryInfo d = new DirectoryInfo(this.collectionPath);//Assuming Test is your Folder
             FileInfo[] Files = d.GetFiles("*.txt"); //Getting Text files
             
@@ -84,19 +89,22 @@ namespace EduSearch_Information_System
             foreach (FileInfo file in Files)
             {
                 string content = File.ReadAllText(file.FullName);
-                docs.Add(FileReadProcess.getAbstract(content));
+                docs.Add(FileReadProcess.getDocumentParts(content));
             }
             return docs;
         }
 
         public void IndexCollection()
         {
-            List<string> docs = createDocumentsList();
-            foreach (string text in docs)
+            List<Dictionary<string,string>> docs = createDocumentsList();
+            foreach (Dictionary<string,string> entry in docs)
             {
-                Lucene.Net.Documents.Field field = new Field(TEXT_FN, text, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
                 Lucene.Net.Documents.Document doc = new Document();
-                doc.Add(field);
+                foreach (KeyValuePair<string, string> section in entry)
+                {
+                    Lucene.Net.Documents.Field field = new Field(section.Key, section.Value, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);                    
+                    doc.Add(field);
+                }
                 writer.AddDocument(doc);
             }
             CleanUpIndexer();
@@ -118,7 +126,7 @@ namespace EduSearch_Information_System
 
         public void CreateParser()
         {
-            parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, TEXT_FN, analyzer);
+            parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, DOC_BODY, analyzer);
         }
 
 
@@ -127,16 +135,50 @@ namespace EduSearch_Information_System
             searcher.Dispose();
         }
 
+        public Query ParseSearchText(string queryText) {
+            Query parsedSearch;
+            try
+            {
+                queryText = queryText.ToLower();
+                parsedSearch = parser.Parse(queryText);
+                
+            }
+            catch
+            {
+                parsedSearch = null;
+            }
 
-        public TopDocs SearchIndex(string querytext)
+            return parsedSearch;
+        }
+
+
+        public List<Dictionary<string,string>> SearchIndex(Query query)
         {
-            System.Console.WriteLine("Searching for " + querytext);
-            querytext = querytext.ToLower();
-            Query query = parser.Parse(querytext);
+            System.Console.WriteLine("Searching for " + query.ToString());
             TopDocs results = searcher.Search(query, 40);
+            List<Dictionary<string, string>> fullResults = new List<Dictionary<string, string>>();
+
+            int docIndex = 0;
+
+            foreach (ScoreDoc doc in results.ScoreDocs)
+            {
+                Document fullDoc = searcher.Doc(doc.Doc);
+                Dictionary<string, string> fields = new Dictionary<string, string>();
+                foreach (Field f in fullDoc.GetFields())
+                {
+                    fields[f.Name] = f.StringValue;
+                }
+                if(fields.Keys.Count > 0)
+                {
+                    fullResults.Add(fields);
+                }                
+                docIndex++;
+            }
+
             Console.WriteLine("================================================================================================");
             System.Console.WriteLine("Number of results is " + results.TotalHits);
-            return results;
+
+            return fullResults;
 
         }
 
@@ -149,7 +191,7 @@ namespace EduSearch_Information_System
                 rank++;
                 // retrieve the document from the 'ScoreDoc' object
                 Lucene.Net.Documents.Document doc = searcher.Doc(scoreDoc.Doc);
-                string myFieldValue = doc.Get(TEXT_FN).ToString();
+                string myFieldValue = doc.Get(DOC_BODY).ToString();
                 //Console.WriteLine("Rank " + rank + " score " + scoreDoc.Score + " text " + myFieldValue);
                 foreach (KeyValuePair<string, string[]> resultList in cranquelIdeal) {
                     if (Array.Exists(cranquelIdeal[resultList.Key], element => element == scoreDoc.Doc.ToString())) {

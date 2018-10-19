@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.groupBoxIndexSelection = new System.Windows.Forms.GroupBox();
+            this.lblCollectionLocation = new System.Windows.Forms.Label();
+            this.lblIndexLocation = new System.Windows.Forms.Label();
             this.btnIndexAccept = new System.Windows.Forms.Button();
             this.lblIndexFeedback = new System.Windows.Forms.Label();
             this.lblCollectionLoc = new System.Windows.Forms.Label();
@@ -49,6 +51,8 @@
             this.btnMPSearch = new System.Windows.Forms.Button();
             this.txtBoxMPSearchInput = new System.Windows.Forms.TextBox();
             this.tabSimpleSearch = new System.Windows.Forms.TabPage();
+            this.lblIndexInformation = new System.Windows.Forms.Label();
+            this.lblIndexInfoTitle = new System.Windows.Forms.Label();
             this.labelTermSearch = new System.Windows.Forms.Label();
             this.lblSearchTitle = new System.Windows.Forms.Label();
             this.btnSaveResults = new System.Windows.Forms.Button();
@@ -63,10 +67,6 @@
             this.txtSimpleSearch = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
-            this.lblIndexLocation = new System.Windows.Forms.Label();
-            this.lblCollectionLocation = new System.Windows.Forms.Label();
-            this.lblIndexInfoTitle = new System.Windows.Forms.Label();
-            this.lblIndexInformation = new System.Windows.Forms.Label();
             this.groupBoxIndexSelection.SuspendLayout();
             this.tabMultiPhraseSearch.SuspendLayout();
             this.tabSimpleSearch.SuspendLayout();
@@ -89,6 +89,23 @@
             this.groupBoxIndexSelection.TabIndex = 8;
             this.groupBoxIndexSelection.TabStop = false;
             this.groupBoxIndexSelection.Text = "Indexing";
+            // 
+            // lblCollectionLocation
+            // 
+            this.lblCollectionLocation.AutoSize = true;
+            this.lblCollectionLocation.Location = new System.Drawing.Point(30, 65);
+            this.lblCollectionLocation.Name = "lblCollectionLocation";
+            this.lblCollectionLocation.Size = new System.Drawing.Size(0, 13);
+            this.lblCollectionLocation.TabIndex = 12;
+            // 
+            // lblIndexLocation
+            // 
+            this.lblIndexLocation.AutoSize = true;
+            this.lblIndexLocation.Location = new System.Drawing.Point(512, 61);
+            this.lblIndexLocation.Name = "lblIndexLocation";
+            this.lblIndexLocation.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.lblIndexLocation.Size = new System.Drawing.Size(0, 13);
+            this.lblIndexLocation.TabIndex = 11;
             // 
             // btnIndexAccept
             // 
@@ -280,6 +297,24 @@
             this.tabSimpleSearch.Text = "Simple Search";
             this.tabSimpleSearch.UseVisualStyleBackColor = true;
             // 
+            // lblIndexInformation
+            // 
+            this.lblIndexInformation.AutoSize = true;
+            this.lblIndexInformation.Location = new System.Drawing.Point(19, 258);
+            this.lblIndexInformation.Name = "lblIndexInformation";
+            this.lblIndexInformation.Size = new System.Drawing.Size(0, 13);
+            this.lblIndexInformation.TabIndex = 18;
+            // 
+            // lblIndexInfoTitle
+            // 
+            this.lblIndexInfoTitle.AutoSize = true;
+            this.lblIndexInfoTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblIndexInfoTitle.Location = new System.Drawing.Point(15, 230);
+            this.lblIndexInfoTitle.Name = "lblIndexInfoTitle";
+            this.lblIndexInfoTitle.Size = new System.Drawing.Size(171, 24);
+            this.lblIndexInfoTitle.TabIndex = 17;
+            this.lblIndexInfoTitle.Text = "Index Information";
+            // 
             // labelTermSearch
             // 
             this.labelTermSearch.AutoSize = true;
@@ -401,41 +436,6 @@
             this.tabControl1.Size = new System.Drawing.Size(1105, 816);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.Visible = false;
-            // 
-            // lblIndexLocation
-            // 
-            this.lblIndexLocation.AutoSize = true;
-            this.lblIndexLocation.Location = new System.Drawing.Point(512, 61);
-            this.lblIndexLocation.Name = "lblIndexLocation";
-            this.lblIndexLocation.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.lblIndexLocation.Size = new System.Drawing.Size(0, 13);
-            this.lblIndexLocation.TabIndex = 11;
-            // 
-            // lblCollectionLocation
-            // 
-            this.lblCollectionLocation.AutoSize = true;
-            this.lblCollectionLocation.Location = new System.Drawing.Point(30, 65);
-            this.lblCollectionLocation.Name = "lblCollectionLocation";
-            this.lblCollectionLocation.Size = new System.Drawing.Size(0, 13);
-            this.lblCollectionLocation.TabIndex = 12;
-            // 
-            // lblIndexInfoTitle
-            // 
-            this.lblIndexInfoTitle.AutoSize = true;
-            this.lblIndexInfoTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblIndexInfoTitle.Location = new System.Drawing.Point(15, 230);
-            this.lblIndexInfoTitle.Name = "lblIndexInfoTitle";
-            this.lblIndexInfoTitle.Size = new System.Drawing.Size(171, 24);
-            this.lblIndexInfoTitle.TabIndex = 17;
-            this.lblIndexInfoTitle.Text = "Index Information";
-            // 
-            // lblIndexInformation
-            // 
-            this.lblIndexInformation.AutoSize = true;
-            this.lblIndexInformation.Location = new System.Drawing.Point(19, 258);
-            this.lblIndexInformation.Name = "lblIndexInformation";
-            this.lblIndexInformation.Size = new System.Drawing.Size(0, 13);
-            this.lblIndexInformation.TabIndex = 18;
             // 
             // Form1
             // 

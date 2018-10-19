@@ -7,6 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Lucene.Net.Analysis; // for Analyser
+using Lucene.Net.Documents; // for Document and Field
+using Lucene.Net.Index; //for Index Writer
+using Lucene.Net.Store; //for Directory
+using Lucene.Net.Search; // for IndexSearcher
+using Lucene.Net.QueryParsers;  // for QueryParser
 
 namespace EduSearch_Information_System
 {
@@ -19,10 +25,14 @@ namespace EduSearch_Information_System
         int totalPages;
         private bool indexLocationSelected = false;
         private bool collectionLocationSelected = false;
-        Dictionary<string, Control>[] currentPageResults;
-        Dictionary<string, string>[] searchResults;
+        List<Dictionary<string, string>> searchResults;
         LuceneApp luceneApp;
 
+        const string DOC_TITLE = "Title";
+        const string DOC_AUTHOR = "Author";
+        const string DOC_BIB = "Bibliography";
+        const string DOC_BODY = "Body";
+        const string DOC_ID = "ID";
 
         public Form1()
         {
@@ -30,6 +40,13 @@ namespace EduSearch_Information_System
             currentPage = 1;
             resultsPerPage = 10;
             luceneApp = new LuceneApp();
+        }
+
+
+        public static string Truncate(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value)) return value;
+            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
         }
 
         private void btnIndexAccept_Click(object sender, EventArgs e)
@@ -63,82 +80,103 @@ namespace EduSearch_Information_System
         {            
 
             string searchText = txtSimpleSearch.Text;
+            Query parsedSearch;
+            try
+            {
+                parsedSearch = luceneApp.ParseSearchText(searchText);
+                labelTermSearch.Text = parsedSearch.ToString().Remove(0, 4);
+                searchResults = luceneApp.SearchIndex(parsedSearch);
 
-            Lucene.Net.Search.TopDocs results = luceneApp.SearchIndex(searchText);
-            luceneApp.DisplayResults(results);
+                listView1.Clear();
 
-            /*
-            labelTermSearch.Text = searchText;
-            listView1.Clear();
+                totalResults = searchResults.Count;
+                totalPages = (totalResults / resultsPerPage) + 1;
 
-            searchResults = getResults(new string[] { "search" });
+                Console.WriteLine("Writing {0} results over {1} page", totalResults, totalPages);
 
-            totalResults = searchResults.Length;
-            totalPages = (totalResults / resultsPerPage)+1;
-
-            Console.WriteLine("Writing {0} results over {1} page", totalResults, totalPages);
-
-            changePage(1);
-            */
+                changePage(1);
+            }
+            catch
+            {
+                labelTermSearch.Text = "Please enter search text to get results, dingus.";
+            }            
+            
         }
 
         private void displayPage(int page) {
             page = page > 0 ? page - 1 : 0;
             int startingResult = page * resultsPerPage;
-            int endingResult = limitToRange(page * resultsPerPage + resultsPerPage,searchResults.Length,0);
+            int endingResult = limitToRange(page * resultsPerPage + resultsPerPage,searchResults.Count,0);
             int boxPosition = 0;
 
+            int groupBoxHeight = 80;
+            int groupBoxWidth = 700;
+
+            int titleHeight = 30;
+            int titleWidth = 250;
+            int titleX = 7;
+            int titleY = 12;
+
+            int infoHeight = 30;
+            int infoWidth = 250;
+            int infoX = 7;
+            int infoY = 40;
+
+            int abstractHeight = 80;
+            int abstractWidth = 400;
+            int abstractX = 280;
+            int abstractY = 0;
+
+            int openX = 617;
+            int openY = 57;
+
             Console.WriteLine("Displaying result {0}, {1} for page {2}", startingResult,endingResult,page+1);
+
             listView1.Controls.Clear();
+
             for (int i = startingResult; i < endingResult; i++)
             {
                 GroupBox result = new GroupBox();
 
                 Label title = new Label();
-                title.Text = searchResults[i]["title"];
-                title.Location = new Point(0, 0);
-                title.Size = new Size(150, 30);
+                title.Text = searchResults[i][DOC_TITLE];
+                title.AutoSize = false;
+                title.Location = new Point(titleX, titleY);
+                title.MaximumSize = new Size(titleWidth, titleHeight);
+                title.BackColor = Color.Transparent;
 
-                Label author = new Label();
-                author.Text = searchResults[i]["author"];
-                author.Location = new Point(150, 0);
-                author.Size = new Size(150, 30);
-
-                Label bibliographicInfo = new Label();
-                bibliographicInfo.Text = searchResults[i]["bibliographicInfo"];
-                bibliographicInfo.Location = new Point(300, 0);
-                bibliographicInfo.Size = new Size(150, 30);
+                Label info = new Label();
+                info.Text = searchResults[i][DOC_AUTHOR] + "  -  " + searchResults[i][DOC_BIB];
+                info.AutoSize = false;
+                info.Location = new Point(infoX, infoY);
+                info.Size = new Size(infoWidth, infoHeight);
+                info.BackColor = Color.Transparent;
 
                 Label textAbstract = new Label();
-                textAbstract.Text = searchResults[i]["abstract"];
-                textAbstract.Location = new Point(0, 50);
-                textAbstract.Size = new Size(400, 30);
+                textAbstract.Text = Truncate(searchResults[i][DOC_BODY],250);
+                textAbstract.AutoSize = false;
+                textAbstract.Location = new Point(abstractX, abstractY);
+                textAbstract.Size = new Size(abstractWidth, abstractHeight);
+                textAbstract.BackColor = Color.Transparent;
+
+                Button openResult = new Button();
+                openResult.Text = "Open";
+                openResult.Location = new Point(openX,openY);
+                openResult.BringToFront();
 
                 result.Controls.Add(title);
-                result.Controls.Add(author);
-                result.Controls.Add(bibliographicInfo);
+                result.Controls.Add(info);                
                 result.Controls.Add(textAbstract);
+                result.Controls.Add(openResult);
+
+                //TODO Assign full result window
 
                 listView1.Controls.Add(result);
-                result.Size = new Size(450, 80);
-                result.Location = new Point(0, boxPosition * 80);
+                result.Size = new Size(groupBoxWidth, groupBoxHeight);
+                result.Location = new Point(0, boxPosition * groupBoxHeight);
                 boxPosition++;
 
             }
-        }
-
-        public Dictionary<string,string>[] getResults(string[] search) {
-            int returnSize = 26;
-            Dictionary<string,string>[] results = new Dictionary<string, string>[returnSize];
-            
-            for(int i = 0; i < returnSize; i++) {
-                results[i] = new Dictionary<string, string>();
-                results[i].Add("title","Title-"+(i+1));
-                results[i].Add("author", "Author-"+(i+1));
-                results[i].Add("bibliographicInfo", "bibinfo-" + (i+1));
-                results[i].Add("abstract", "Abstract-" + (i+1));
-            }
-            return results;
         }
 
         private void btnPaginationNext_Click(object sender, EventArgs e)
@@ -203,6 +241,11 @@ namespace EduSearch_Information_System
             folderBrowserDialog1.ShowDialog();
             lblIndexLocation.Text = folderBrowserDialog1.SelectedPath;
             indexLocationSelected = true;
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

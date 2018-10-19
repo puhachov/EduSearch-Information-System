@@ -3,34 +3,68 @@ using System.Collections.Generic;
 
 class FileReadProcess
 {
+
+    const string DOC_TITLE = "Title";
+    const string DOC_AUTHOR = "Author";
+    const string DOC_BIB = "Bibliography";
+    const string DOC_BODY = "Body";
+    const string DOC_ID = "ID";
+
     public static string ReadFile(string path)
-    {          
+    {
 
         System.IO.TextReader reader = new System.IO.StreamReader(path);
-        string text = reader.ReadToEnd();            
+        string text = reader.ReadToEnd();
         reader.Close();
         return text;
     }
 
+    public static Dictionary<string, string> getDocumentParts(string document) {
+        Dictionary<string, string> documentObj = new Dictionary<string, string>();
+
+        string docNo = getSection(document, @".I([\s\S]+?)\.T");
+        string title = getSection(document, @".T\n([\s\S]+?)\.A");
+        string author = getSection(document, @".A\n([\s\S]+?)\.B");
+        string bib = getSection(document, @".B\n([\s\S]+?)\.W");
+        string body = getSection(document, @"\.W([\s\S]+)");
+
+        body = ReplaceFirstOccurrence(body,title,"");
+
+        documentObj.Add(DOC_ID, docNo);
+        documentObj.Add(DOC_TITLE, title);
+        documentObj.Add(DOC_AUTHOR, author);
+        documentObj.Add(DOC_BIB, bib);
+        documentObj.Add(DOC_BODY, body);
+
+        return documentObj;
+    }
+
     //remove title and extract abstract from document
-    public static string getAbstract(string text)
+    public static string getSection(string text, string sectionPattern)
     {
-        string titlePattern = @".T\n([\s\S]+?)\.A";
+        string section = "";
         try
         {
-            string title = Regex.Match(text, titlePattern).Groups[1].ToString();
-            text = text.Replace(title, "");
+            section = Regex.Match(text, sectionPattern).Groups[1].ToString();
+            section.Replace('\n', ' ');
         }
         catch (System.ArgumentException e)
         {
             //title not found - do nothing
         }
-       
-        
-        string pattern = @"[\s\S]+\.W([\s\S]+)";
-        Match match = Regex.Match(text, pattern);
-        return match.Groups[1].ToString();
 
+        return section;
+    }
+
+    public static string ReplaceFirstOccurrence(string Source, string Find, string Replace)
+    {
+        int Place = Source.IndexOf(Find);
+        string result = Source;
+        if (Place > -1)
+        {
+            result = Source.Remove(Place, Find.Length);
+        }
+        return result;
     }
 
     //extract information needs into a List
