@@ -155,7 +155,7 @@ namespace EduSearch_Information_System
         public List<Dictionary<string,string>> SearchIndex(Query query)
         {
             System.Console.WriteLine("Searching for " + query.ToString());
-            TopDocs results = searcher.Search(query, 40);
+            TopDocs results = searcher.Search(query,200);
             List<Dictionary<string, string>> fullResults = new List<Dictionary<string, string>>();
 
             int docIndex = 0;
@@ -211,8 +211,6 @@ namespace EduSearch_Information_System
                 Console.WriteLine(item + "\n------------------------------------------------------------------------------------------------");
             }
         }
-
-
 
     }
 }
