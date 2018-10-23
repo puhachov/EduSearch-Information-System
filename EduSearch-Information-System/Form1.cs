@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.IO;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -27,18 +28,21 @@ namespace EduSearch_Information_System
         private bool collectionLocationSelected = false;
         List<Dictionary<string, string>> searchResults;
         LuceneApp luceneApp;
+        int currentSearch;
 
         const string DOC_TITLE = "Title";
         const string DOC_AUTHOR = "Author";
         const string DOC_BIB = "Bibliography";
         const string DOC_BODY = "Body";
         const string DOC_ID = "ID";
+        const string DOC_RANK = "Rank";
 
         public Form1()
         {
             InitializeComponent();
             currentPage = 1;
             resultsPerPage = 10;
+            currentSearch = 0;
             luceneApp = new LuceneApp();
         }
 
@@ -89,7 +93,15 @@ namespace EduSearch_Information_System
                     searchText = String.Format("{0}",searchText);
                 }
                 parsedSearch = luceneApp.ParseSearchText(searchText);
-                searchResults = luceneApp.SearchIndex(parsedSearch);
+
+                Dictionary<string, float> weights = new Dictionary<string, float>();
+
+                weights.Add(DOC_AUTHOR,(float)numAuthorWeight.Value);
+                weights.Add(DOC_TITLE,(float)numTitleWeight.Value);
+                weights.Add(DOC_BIB,(float)numBibWeight.Value);
+                weights.Add(DOC_BODY, (float)numBodyWeight.Value);                
+
+                searchResults = luceneApp.SearchIndex(parsedSearch,weights);
 
                 //listPanel1.Clear();
 
@@ -98,15 +110,19 @@ namespace EduSearch_Information_System
 
                 Console.WriteLine("Writing {0} results over {1} page", totalResults, totalPages);
 
+                watch.Stop();
+                float elapsedS = watch.ElapsedMilliseconds / (float)1000.00;
+                searchInfo.Text = String.Format("{0} results returned in {1} seconds for a search of: {2}", totalResults, elapsedS, parsedSearch.ToString());
+
                 changePage(1);
+                currentSearch++;
             }
             else
             {
+                watch.Stop();
                 searchInfo.Text = "Please enter search text to get results, dingus.";
             }
-            watch.Stop();
-            float elapsedS = watch.ElapsedMilliseconds / (float)1000.00;
-            searchInfo.Text = String.Format("{0} results returned in {1} seconds for a search of: {2}",totalResults,elapsedS,searchText);
+
         }
 
         private void displayPage(int page)
@@ -331,7 +347,23 @@ namespace EduSearch_Information_System
 
         private void btnSaveResults_Click(object sender, EventArgs e)
         {
-
+            int resultNo = 1;
+            FolderBrowserDialog saveTo = new FolderBrowserDialog();
+            saveTo.Description = "Select where to save your results";
+            DialogResult saveResult = saveTo.ShowDialog();
+            if (saveResult == DialogResult.OK) {
+                string filePath = @saveTo.SelectedPath+"\\results.txt";
+                using (FileStream fs = new FileStream(filePath, FileMode.Append, FileAccess.Write))
+                using (StreamWriter sw = new StreamWriter(fs))
+                {                    
+                    foreach (Dictionary<string, string> result in searchResults)
+                    {
+                        string paddedResult = numQueryNo.Text.PadLeft(3, '0');
+                        sw.WriteLine(String.Format("{0} Q0 {1} {2} {3} n10323546_n10305769_n8551138 \n", paddedResult, result[DOC_ID].Replace("\n", ""), resultNo.ToString(), result[DOC_RANK]));
+                        resultNo++;
+                    }
+                }
+            }
         }
 
         private void lblSearchOptionsTitle_Click(object sender, EventArgs e)
@@ -375,6 +407,31 @@ namespace EduSearch_Information_System
         }
 
         private void lblTermDisplayTitle_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click_1(object sender, EventArgs e)
         {
 
         }

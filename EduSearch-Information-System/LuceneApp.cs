@@ -30,6 +30,10 @@ namespace EduSearch_Information_System
         const string DOC_BIB = "Bibliography";
         const string DOC_BODY = "Body";
         const string DOC_ID = "ID";
+        const string DOC_RANK = "Rank";
+
+        public string[] parserFields;
+        public Dictionary<string,float> fieldWeights;
 
         private readonly string[] STOP_WORDS = new string[]{ "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
             "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't",
@@ -51,6 +55,11 @@ namespace EduSearch_Information_System
             luceneIndexDirectory = null;
             analyzer = null;
             writer = null;
+            parserFields = new string[] { DOC_TITLE, DOC_AUTHOR, DOC_BIB, DOC_BODY };
+            fieldWeights = new Dictionary<string, float>();
+            foreach(string field in parserFields) {
+                fieldWeights.Add(field, 1);
+            }            
             cranquelIdeal.Add("001", new string[] { "184", "29", "31", "12", "51", "102", "13", "14", "15", "57", "378", "859", "185", "30", "37", "52", "142", "195", "875", "56", "66", "95", "462", "497", "858", "876", "879", "880", "486" });
             cranquelIdeal.Add("002", new string[] { "12", "15", "184", "858", "51", "102", "202", "14", "52", "380", "746", "859", "948", "285", "390", "391", "442", "497", "643", "856", "857", "877", "864", "658", "486" });
             cranquelIdeal.Add("23", new string[] { "900", "902", "200", "201", "601", "899", "903", "593", "199", "594", "901", "544", "597", "749", "917", "919", "1333", "634", "687", "698", "1290", "700", "704", "705", "1109", "1112", "1141", "1197", "1256", "1259", "1272", "1289", "892" });
@@ -126,7 +135,7 @@ namespace EduSearch_Information_System
 
         public void CreateParser()
         {
-            parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, DOC_BODY, analyzer);
+            parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_30, parserFields, analyzer, fieldWeights);
         }
 
 
@@ -151,9 +160,10 @@ namespace EduSearch_Information_System
             return parsedSearch;
         }
 
+        public List<Dictionary<string,string>> SearchIndex(Query query, Dictionary<string,float> weights){
 
-        public List<Dictionary<string,string>> SearchIndex(Query query)
-        {
+            parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_30, parserFields, analyzer, weights);
+
             System.Console.WriteLine("Searching for " + query.ToString());
             TopDocs results = searcher.Search(query,200);
             List<Dictionary<string, string>> fullResults = new List<Dictionary<string, string>>();
@@ -168,6 +178,7 @@ namespace EduSearch_Information_System
                 {
                     fields[f.Name] = f.StringValue;
                 }
+                fields[DOC_RANK] = doc.Score.ToString().Replace("\n","");
                 if(fields.Keys.Count > 0)
                 {
                     fullResults.Add(fields);
@@ -177,6 +188,8 @@ namespace EduSearch_Information_System
 
             Console.WriteLine("================================================================================================");
             System.Console.WriteLine("Number of results is " + results.TotalHits);
+
+            DisplayResults(results);
 
             return fullResults;
 
