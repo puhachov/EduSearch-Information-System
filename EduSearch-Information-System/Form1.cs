@@ -94,6 +94,15 @@ namespace EduSearch_Information_System
             {
                 List<String> phraseList = null;
                 BooleanQuery booleanQuery = new BooleanQuery();
+                Query parsedSearch = luceneApp.ParseSearchText(searchText);
+
+                // Define weights for the fields
+                Dictionary<string, float> weights = new Dictionary<string, float>();
+
+                weights.Add(DOC_AUTHOR, (float)numAuthorWeight.Value);
+                weights.Add(DOC_TITLE, (float)numTitleWeight.Value);
+                weights.Add(DOC_BIB, (float)numBibWeight.Value);
+                weights.Add(DOC_BODY, (float)numBodyWeight.Value);
 
                 // If single/multi phrase search
                 if (checkPhrase.Checked)
@@ -104,6 +113,8 @@ namespace EduSearch_Information_System
                         List<String> stringList = txtSimpleSearch.Text.Replace("\"", "").Split(' ').ToList();
                         phraseList = luceneApp.getPhrasesInString(searchText);
                         searchText = luceneApp.QueryExpansion(stringList.Concat(phraseList), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
+                        parsedSearch = luceneApp.ParseSearchText(searchText);
+                        searchResults = luceneApp.SearchIndex(parsedSearch, weights);
                     }
                     
                 }
@@ -114,24 +125,21 @@ namespace EduSearch_Information_System
                     // If query expansion
                     if (queryExpansionCB.Checked)
                     {
-                        String[] stringList = txtSimpleSearch.Text.Split(' ');
-                        //searchText = luceneApp.QueryExpansion(stringList.ToList(), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
-                        booleanQuery = luceneApp.BooleanQueryExpansion(stringList.ToList(), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
+                        List<String> stringList = luceneApp.SimpleTokenizeQuery(searchText);
+                        searchText = luceneApp.QueryExpansion2(stringList, checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
+                        //booleanQuery = luceneApp.BooleanQueryExpansion(stringList.ToList(), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
+
+                        // Search
+                        //searchResults = luceneApp.SearchIndex(booleanQuery, weights);
+                        parsedSearch = luceneApp.ParseSearchText(searchText);
+                        searchResults = luceneApp.SearchIndex(parsedSearch, weights);
                     }
                 }
 
-                Query parsedSearch;
-                parsedSearch = luceneApp.ParseSearchText(searchText);
-
-                Dictionary<string, float> weights = new Dictionary<string, float>();
-
-                weights.Add(DOC_AUTHOR,(float)numAuthorWeight.Value);
-                weights.Add(DOC_TITLE,(float)numTitleWeight.Value);
-                weights.Add(DOC_BIB,(float)numBibWeight.Value);
-                weights.Add(DOC_BODY, (float)numBodyWeight.Value);                
-
+                //Query parsedSearch;
+                //parsedSearch = luceneApp.ParseSearchText(searchText);
                 //searchResults = luceneApp.SearchIndex(parsedSearch,weights);
-                searchResults = luceneApp.SearchIndex(booleanQuery, weights);
+                //searchResults = luceneApp.SearchIndex(booleanQuery, weights);
 
                 //listPanel1.Clear();
 
