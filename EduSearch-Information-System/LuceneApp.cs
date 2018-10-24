@@ -164,13 +164,55 @@ namespace EduSearch_Information_System
             searcher.Dispose();
         }
 
+        // ================================================================================================================================================================
+        // ================================================================================================================================================================
+
+        public Dictionary<string, string[]> CreateExtendedTermDictionary()
+        {
+            Dictionary<string, string[]> termDictionary = new Dictionary<string, string[]>();
+
+            termDictionary.Add("must", new[] { "123", "456", "789" });
+            termDictionary.Add("aeroelast", new[] { "112233", "445566" });
+            termDictionary.Add("structur", new[] { "111222333", "444555666", "777888999" });
+            return termDictionary;
+        }
+
+        public string GetExpandedQuery(Dictionary<string, string[]> thesaurus, string queryTerm)
+        {
+            string expandedQuery = "";
+            if (thesaurus.ContainsKey(queryTerm))
+            {
+                string[] array = thesaurus[queryTerm];
+                foreach (string a in array)
+                {
+                    expandedQuery += " " + a;
+                }
+            }
+            return expandedQuery;
+        }
+
+        // ================================================================================================================================================================
+        // ================================================================================================================================================================
+
         public Query ParseSearchText(string queryText) {
+            // Add extended query
+            System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText\n variable: queryText\n " + queryText + "\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+
             Query parsedSearch;
+            HashSet<Term> terms = null;
             try
             {
                 queryText = queryText.ToLower();
                 parsedSearch = parser.Parse(queryText);
-                
+                terms = new HashSet<Term>();
+                parsedSearch.ExtractTerms(terms);
+                System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText --> ExtractTerms --> foreach\n");
+                System.Console.WriteLine(terms.ToString());
+                System.Console.WriteLine("\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+
+
+                //System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText\n variable: parsedSearch\n " + parsedSearch + "\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+
             }
             catch
             {
@@ -184,7 +226,7 @@ namespace EduSearch_Information_System
 
             parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_30, parserFields, analyzer, weights);
 
-            System.Console.WriteLine("Searching for " + query.ToString());
+            //System.Console.WriteLine("Searching for " + query.ToString());
             TopDocs results = searcher.Search(query,200);
             List<Dictionary<string, string>> fullResults = new List<Dictionary<string, string>>();
 
