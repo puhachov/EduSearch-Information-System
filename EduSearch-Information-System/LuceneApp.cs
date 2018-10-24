@@ -70,7 +70,8 @@ namespace EduSearch_Information_System
             cranquelIdeal.Add("219", new string[] { "1391", "666", "667", "1258", "1078", "1080", "1081", "1394", "1395", "1214", "1198", "1204", "1300", "559", "630", "662", "1107", "1213", "1191" });
 
             // Init WordNet
-            var directory = "../wordnetdic";
+            // Src: https://developer.syn.co.in/tutorial/wordnet/tutorial.html
+            var directory = "../../../wordnetdic";
 
             wordNetEngine = new WordNetEngine();
 
@@ -85,6 +86,10 @@ namespace EduSearch_Information_System
             wordNetEngine.AddIndexSource(new StreamReader(Path.Combine(directory, "index.adv")), PartOfSpeech.Adverb);
             wordNetEngine.AddIndexSource(new StreamReader(Path.Combine(directory, "index.noun")), PartOfSpeech.Noun);
             wordNetEngine.AddIndexSource(new StreamReader(Path.Combine(directory, "index.verb")), PartOfSpeech.Verb);
+
+            Console.WriteLine("Loading database...");
+            wordNetEngine.Load();
+            Console.WriteLine("Load completed.");
         }
 
         public int GetIndexSize() {            
@@ -192,16 +197,89 @@ namespace EduSearch_Information_System
             //System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText\n variable: queryText\n " + queryText + "\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
         }
 
+        public List<String> TokenizeQuery(String query)
+        {
+            List<String> tokens = new List<String>();
+
+            TokenStream tokenStream = analyzer.TokenStream(null, new StringReader(query));
+            tokenStream.Reset();
+            do
+            {
+                tokens.Add(tokenStream.GetAttribute<Lucene.Net.Analysis.Tokenattributes.ITermAttribute>().Term);
+            }
+            while (tokenStream.IncrementToken());
+
+            return tokens;
+        }
+
+        public String QueryExpansion(List<String> tokens)
+        {
+            String expansion = "";
+
+            foreach (String token in tokens)
+            {
+                System.Console.WriteLine("\n\n          ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: QueryExpansion --> foreach\n");
+                System.Console.WriteLine("              variable: token =  " + token + "\n");
+
+                expansion += token + " ";
+
+                // For each token, add synonym
+                // src: https://developer.syn.co.in/api/Syn.WordNet.WordNetEngine.html
+                SynSet synSet_noun = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Noun);
+                SynSet synSet_adjective = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adjective);
+
+                System.Console.WriteLine(" ~~~~~~~ Nouns\n");
+
+                try
+                {
+                    foreach (var noun_syn in synSet_noun.Words)
+                    {
+                        System.Console.WriteLine("              noun_syn: synonym =  " + noun_syn + "\n");
+                    }
+                }
+                catch (NullReferenceException e)
+                {
+
+                    // Noun does not contain synonym
+                }
+
+                System.Console.WriteLine(" ~~~~~~~ Adjectives\n");
+                
+                try
+                {
+                    foreach (var adj_syn in synSet_adjective.Words)
+                    {
+                        System.Console.WriteLine("              noun_syn: synonym =  " + adj_syn + "\n");
+                    }
+                }
+                catch (NullReferenceException e)
+                {
+
+                    // Noun does not contain adjectives
+                }
+
+
+                System.Console.WriteLine("              ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+
+            }
+
+            return expansion;
+        }
+
         // ================================================================================================================================================================
         // ================================================================================================================================================================
 
-        public Query ParseSearchText(string queryText)
+        public Query ParseSearchText(string query)
         {
+            List<String> tokenizedQuery = TokenizeQuery(query);
+
+            String queryExpansion = QueryExpansion(tokenizedQuery);
+
             Query parsedSearch;
             try
             {
-                queryText = queryText.ToLower();
-                parsedSearch = parser.Parse(queryText);
+                query = query.ToLower();
+                parsedSearch = parser.Parse(query);
 
             }
             catch
@@ -278,4 +356,23 @@ namespace EduSearch_Information_System
         }
 
     }
+
+    /*
+     * 
+     * 
+        SINGLE
+        System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText\n variable: queryText\n " + queryText + "\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+
+        LOOP
+        System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText --> foreach\n");
+        foreach (var item in collection)
+	    {
+            System.Console.WriteLine(" variable: item\n " + item + "\n");
+	    }
+        System.Console.WriteLine(" ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+
+     * 
+     */
+
 }
+ 
