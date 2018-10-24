@@ -234,6 +234,7 @@ namespace EduSearch_Information_System
                 {
                     foreach (var noun_syn in synSet_noun.Words)
                     {
+                        expansion += noun_syn + ' ';
                         System.Console.WriteLine("              noun_syn: synonym =  " + noun_syn + "\n");
                     }
                 }
@@ -249,6 +250,7 @@ namespace EduSearch_Information_System
                 {
                     foreach (var adj_syn in synSet_adjective.Words)
                     {
+                        expansion += adj_syn + ' ';
                         System.Console.WriteLine("              noun_syn: synonym =  " + adj_syn + "\n");
                     }
                 }

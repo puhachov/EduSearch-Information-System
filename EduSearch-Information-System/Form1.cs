@@ -85,7 +85,10 @@ namespace EduSearch_Information_System
         {
             System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
             Query parsedSearch;
-            string searchText = txtSimpleSearch.Text;
+            //if term search
+            String[] stringList = txtSimpleSearch.Text.Split(' ');
+            string searchText = luceneApp.QueryExpansion(stringList.ToList());
+            //else phrase search            
             if (searchText.Length > 0)
             {
                 if (checkPhrase.Checked == true)
