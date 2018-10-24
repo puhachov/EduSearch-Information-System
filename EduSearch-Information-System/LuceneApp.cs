@@ -7,6 +7,7 @@ using Lucene.Net.Store; //for Directory
 using Lucene.Net.Search; // for IndexSearcher
 using Lucene.Net.QueryParsers;  // for QueryParser
 using System.IO; //to work with directories
+using Syn.WordNet;
 using static FileReadProcess; //to read and process files
 
 
@@ -34,6 +35,8 @@ namespace EduSearch_Information_System
 
         public string[] parserFields;
         public Dictionary<string,float> fieldWeights;
+
+        WordNetEngine wordNetEngine;
 
         private readonly string[] STOP_WORDS = new string[]{ "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
             "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't",
@@ -65,6 +68,23 @@ namespace EduSearch_Information_System
             cranquelIdeal.Add("23", new string[] { "900", "902", "200", "201", "601", "899", "903", "593", "199", "594", "901", "544", "597", "749", "917", "919", "1333", "634", "687", "698", "1290", "700", "704", "705", "1109", "1112", "1141", "1197", "1256", "1259", "1272", "1289", "892" });
             cranquelIdeal.Add("157", new string[] { "273", "1105", "1106", "93", "161", "302", "122", "666", "1107", "556", "25", "1011", "19", "35", "1355", "372", "410", "456", "36", "44", "215", "626", "1151", "354", "369", "370", "421", "557", "605", "655", "657", "689", "1307", "318", "423", "1304", "160", "482", "572", "1006" });
             cranquelIdeal.Add("219", new string[] { "1391", "666", "667", "1258", "1078", "1080", "1081", "1394", "1395", "1214", "1198", "1204", "1300", "559", "630", "662", "1107", "1213", "1191" });
+
+            // Init WordNet
+            var directory = "../wordnetdic";
+
+            wordNetEngine = new WordNetEngine();
+
+            // data sources
+            wordNetEngine.AddDataSource(new StreamReader(Path.Combine(directory, "data.adj")), PartOfSpeech.Adjective);
+            wordNetEngine.AddDataSource(new StreamReader(Path.Combine(directory, "data.adv")), PartOfSpeech.Adverb);
+            wordNetEngine.AddDataSource(new StreamReader(Path.Combine(directory, "data.noun")), PartOfSpeech.Noun);
+            wordNetEngine.AddDataSource(new StreamReader(Path.Combine(directory, "data.verb")), PartOfSpeech.Verb);
+
+            // indexes
+            wordNetEngine.AddIndexSource(new StreamReader(Path.Combine(directory, "index.adj")), PartOfSpeech.Adjective);
+            wordNetEngine.AddIndexSource(new StreamReader(Path.Combine(directory, "index.adv")), PartOfSpeech.Adverb);
+            wordNetEngine.AddIndexSource(new StreamReader(Path.Combine(directory, "index.noun")), PartOfSpeech.Noun);
+            wordNetEngine.AddIndexSource(new StreamReader(Path.Combine(directory, "index.verb")), PartOfSpeech.Verb);
         }
 
         public int GetIndexSize() {            
