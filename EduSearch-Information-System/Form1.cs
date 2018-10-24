@@ -83,18 +83,44 @@ namespace EduSearch_Information_System
 
         private void btnSimpleSearch_Click(object sender, EventArgs e)
         {
+            // Start stopwatch
             System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
-            Query parsedSearch;
-            //if term search
-            String[] stringList = txtSimpleSearch.Text.Split(' ');
-            string searchText = luceneApp.QueryExpansion(stringList.ToList());
-            //else phrase search            
+
+            // Get user input
+            string searchText = txtSimpleSearch.Text.ToLower();
+            
+            // If user input field is not empty
             if (searchText.Length > 0)
             {
-                if (checkPhrase.Checked == true)
+                List<String> phraseList = null;
+                BooleanQuery booleanQuery = new BooleanQuery();
+
+                // If single/multi phrase search
+                if (checkPhrase.Checked)
                 {
-                    searchText = String.Format("{0}",searchText);
+                    // If query expansion
+                    if (queryExpansionCB.Checked)
+                    {
+                        List<String> stringList = txtSimpleSearch.Text.Replace("\"", "").Split(' ').ToList();
+                        phraseList = luceneApp.getPhrasesInString(searchText);
+                        searchText = luceneApp.QueryExpansion(stringList.Concat(phraseList), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
+                    }
+                    
                 }
+
+                // If single/multi term search
+                else
+                {
+                    // If query expansion
+                    if (queryExpansionCB.Checked)
+                    {
+                        String[] stringList = txtSimpleSearch.Text.Split(' ');
+                        //searchText = luceneApp.QueryExpansion(stringList.ToList(), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
+                        booleanQuery = luceneApp.BooleanQueryExpansion(stringList.ToList(), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
+                    }
+                }
+
+                Query parsedSearch;
                 parsedSearch = luceneApp.ParseSearchText(searchText);
 
                 Dictionary<string, float> weights = new Dictionary<string, float>();
@@ -104,7 +130,8 @@ namespace EduSearch_Information_System
                 weights.Add(DOC_BIB,(float)numBibWeight.Value);
                 weights.Add(DOC_BODY, (float)numBodyWeight.Value);                
 
-                searchResults = luceneApp.SearchIndex(parsedSearch,weights);
+                //searchResults = luceneApp.SearchIndex(parsedSearch,weights);
+                searchResults = luceneApp.SearchIndex(booleanQuery, weights);
 
                 //listPanel1.Clear();
 
@@ -435,6 +462,26 @@ namespace EduSearch_Information_System
         }
 
         private void label2_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkPhrase_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabSimpleSearch_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
 
         }

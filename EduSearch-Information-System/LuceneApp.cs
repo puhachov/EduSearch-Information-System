@@ -8,6 +8,7 @@ using Lucene.Net.Search; // for IndexSearcher
 using Lucene.Net.QueryParsers;  // for QueryParser
 using System.IO; //to work with directories
 using Syn.WordNet;
+using System.Text.RegularExpressions;
 using static FileReadProcess; //to read and process files
 
 
@@ -212,14 +213,14 @@ namespace EduSearch_Information_System
             return tokens;
         }
 
-        public String QueryExpansion(List<String> tokens)
+        public String QueryExpansion(IEnumerable<String> tokens, Boolean checkForNoun, Boolean checkForAdj, Boolean checkForVerb, Boolean checkForAdverb)
         {
             String expansion = "";
 
             foreach (String token in tokens)
             {
-                System.Console.WriteLine("\n\n          ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: QueryExpansion --> foreach\n");
-                System.Console.WriteLine("              variable: token =  " + token + "\n");
+                System.Console.WriteLine("\n\n~~~~~~~~~~~~~~~~~~~~~~~~ Getting synonyms from WordNet\n");
+                System.Console.WriteLine("Synonyms for token =  " + token + "\n");
 
                 expansion += token + " ";
 
@@ -227,45 +228,269 @@ namespace EduSearch_Information_System
                 // src: https://developer.syn.co.in/api/Syn.WordNet.WordNetEngine.html
                 SynSet synSet_noun = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Noun);
                 SynSet synSet_adjective = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adjective);
+                SynSet synSet_verb = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Verb);
+                SynSet synSet_adverb = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adverb);
 
-                System.Console.WriteLine(" ~~~~~~~ Nouns\n");
 
-                try
+                System.Console.WriteLine("~~~~~~~ Nouns\n");
+
+                if (checkForNoun)
                 {
-                    foreach (var noun_syn in synSet_noun.Words)
+                    try
                     {
-                        expansion += noun_syn + ' ';
-                        System.Console.WriteLine("              noun_syn: synonym =  " + noun_syn + "\n");
+                        foreach (var noun_syn in synSet_noun.Words)
+                        {
+                            if (!expansion.Contains(noun_syn))
+                            {
+                                expansion += noun_syn + ' ';
+                                System.Console.WriteLine(noun_syn);
+                            }
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+
+                        // Noun does not contain synonym
                     }
                 }
-                catch (NullReferenceException e)
-                {
 
-                    // Noun does not contain synonym
-                }
+                System.Console.WriteLine("~~~~~~~ Adjectives\n");
 
-                System.Console.WriteLine(" ~~~~~~~ Adjectives\n");
-                
-                try
+                if (checkForAdj)
                 {
-                    foreach (var adj_syn in synSet_adjective.Words)
+                    try
                     {
-                        expansion += adj_syn + ' ';
-                        System.Console.WriteLine("              noun_syn: synonym =  " + adj_syn + "\n");
+                        foreach (var adj_syn in synSet_adjective.Words)
+                        {
+                            if (!expansion.Contains(adj_syn))
+                            {
+                                expansion += adj_syn + ' ';
+                                System.Console.WriteLine(adj_syn);
+                            }
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+
+                        // Noun does not contain adjectives
                     }
                 }
-                catch (NullReferenceException e)
-                {
 
-                    // Noun does not contain adjectives
+                System.Console.WriteLine("~~~~~~~ Verbs\n");
+
+                if (checkForVerb)
+                {
+                    try
+                    {
+                        foreach (var adj_verb in synSet_verb.Words)
+                        {
+                            if (!expansion.Contains(adj_verb))
+                            {
+                                expansion += adj_verb + ' ';
+                                System.Console.WriteLine(adj_verb);
+                            }
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+
+                        // Noun does not contain adjectives
+                    }
                 }
 
+                System.Console.WriteLine("~~~~~~~ Adverbs\n");
 
-                System.Console.WriteLine("              ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+                if (checkForAdverb)
+                {
+                    try
+                    {
+                        foreach (var adj_adverb in synSet_adverb.Words)
+                        {
+                            if (!expansion.Contains(adj_adverb))
+                            {
+                                expansion += adj_adverb + ' ';
+                                System.Console.WriteLine(adj_adverb);
+                            }
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+
+                        // Noun does not contain adjectives
+                    }
+                }
+
+                System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
 
             }
 
             return expansion;
+        }
+
+        public BooleanQuery BooleanQueryExpansion(IEnumerable<String> tokens, Boolean checkForNoun, Boolean checkForAdj, Boolean checkForVerb, Boolean checkForAdverb)
+        {
+            String usedTerms = "";
+            BooleanQuery combining = new BooleanQuery();
+
+            foreach (String token in tokens)
+            {
+                System.Console.WriteLine("\n\n~~~~~~~~~~~~~~~~~~~~~~~~ Getting synonyms from WordNet\n");
+                System.Console.WriteLine("Synonyms for token =  " + token + "\n");
+
+                usedTerms += " " + token;
+                Query mainTokenTITLE = new TermQuery(new Term(DOC_TITLE, token));
+                Query mainTokenBODY = new TermQuery(new Term(DOC_BODY, token));
+                mainTokenTITLE.Boost = 4;
+                mainTokenBODY.Boost = 4;
+                combining.Add(mainTokenTITLE, Occur.MUST);
+                combining.Add(mainTokenBODY, Occur.MUST);
+
+                // For each token, add synonym
+                // src: https://developer.syn.co.in/api/Syn.WordNet.WordNetEngine.html
+                SynSet synSet_noun = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Noun);
+                SynSet synSet_adjective = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adjective);
+                SynSet synSet_verb = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Verb);
+                SynSet synSet_adverb = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adverb);
+
+
+                System.Console.WriteLine("~~~~~~~ Nouns\n");
+
+                if (checkForNoun)
+                {
+                    try
+                    {
+                        foreach (var noun_syn in synSet_noun.Words)
+                        {
+                            if (!usedTerms.Contains(noun_syn))
+                            {
+                                Query tokenTITLE = new TermQuery(new Term(DOC_TITLE, noun_syn));
+                                Query tokenBODY = new TermQuery(new Term(DOC_BODY, noun_syn));
+                                tokenTITLE.Boost = 1;
+                                tokenBODY.Boost = 1;
+                                combining.Add(tokenTITLE, Occur.SHOULD);
+                                combining.Add(tokenBODY, Occur.SHOULD);
+                                usedTerms += " " + noun_syn;
+                                System.Console.WriteLine(noun_syn);
+                            }
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+
+                        // Noun does not contain synonym
+                    }
+                }
+
+                System.Console.WriteLine("~~~~~~~ Adjectives\n");
+
+                if (checkForAdj)
+                {
+                    try
+                    {
+                        foreach (var adj_syn in synSet_adjective.Words)
+                        {
+                            if (!usedTerms.Contains(adj_syn))
+                            {
+                                Query tokenTITLE = new TermQuery(new Term(DOC_TITLE, adj_syn));
+                                Query tokenBODY = new TermQuery(new Term(DOC_BODY, adj_syn));
+                                tokenTITLE.Boost = 1;
+                                tokenBODY.Boost = 1;
+                                combining.Add(tokenTITLE, Occur.SHOULD);
+                                combining.Add(tokenBODY, Occur.SHOULD);
+                                usedTerms += " " + adj_syn;
+                                System.Console.WriteLine(adj_syn);
+                            }
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+
+                        // Noun does not contain adjectives
+                    }
+                }
+
+                System.Console.WriteLine("~~~~~~~ Verbs\n");
+
+                if (checkForVerb)
+                {
+                    try
+                    {
+                        foreach (var adj_verb in synSet_verb.Words)
+                        {
+                            if (!usedTerms.Contains(adj_verb))
+                            {
+                                Query tokenTITLE = new TermQuery(new Term(DOC_TITLE, adj_verb));
+                                Query tokenBODY = new TermQuery(new Term(DOC_BODY, adj_verb));
+                                tokenTITLE.Boost = 1;
+                                tokenBODY.Boost = 1;
+                                combining.Add(tokenTITLE, Occur.SHOULD);
+                                combining.Add(tokenBODY, Occur.SHOULD);
+                                usedTerms += " " + adj_verb;
+                                System.Console.WriteLine(adj_verb);
+                            }
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+
+                        // Noun does not contain adjectives
+                    }
+                }
+
+                System.Console.WriteLine("~~~~~~~ Adverbs\n");
+
+                if (checkForAdverb)
+                {
+                    try
+                    {
+                        foreach (var adj_adverb in synSet_adverb.Words)
+                        {
+                            if (!usedTerms.Contains(adj_adverb))
+                            {
+                                Query tokenTITLE = new TermQuery(new Term(DOC_TITLE, adj_adverb));
+                                Query tokenBODY = new TermQuery(new Term(DOC_BODY, adj_adverb));
+                                tokenTITLE.Boost = 1;
+                                tokenBODY.Boost = 1;
+                                combining.Add(tokenTITLE, Occur.SHOULD);
+                                combining.Add(tokenBODY, Occur.SHOULD);
+                                usedTerms += " " + adj_adverb;
+                                System.Console.WriteLine(adj_adverb);
+                            }
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+
+                        // Noun does not contain adjectives
+                    }
+                }
+
+                System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+
+            }
+
+            foreach (BooleanClause q in combining.GetClauses())
+            {
+                Console.WriteLine("Clause" + q.Query.ToString());
+            }
+
+            return combining;
+        }
+
+        public List<String> getPhrasesInString(String query)
+        {
+            List<String> phrases = new List<string>();
+
+            // Use regex to fetch phrases (everything between " ")
+            MatchCollection mc = Regex.Matches(query, @"""([^""]|"""")*""");
+            foreach (Match m in mc)
+            {
+                String phrase = m.ToString();
+                System.Console.WriteLine("Phrase: " + phrase);
+                phrases.Add(phrase.Replace("\"", ""));
+            }
+
+            return phrases;
         }
 
         // ================================================================================================================================================================
@@ -273,10 +498,6 @@ namespace EduSearch_Information_System
 
         public Query ParseSearchText(string query)
         {
-            List<String> tokenizedQuery = TokenizeQuery(query);
-
-            String queryExpansion = QueryExpansion(tokenizedQuery);
-
             Query parsedSearch;
             try
             {
