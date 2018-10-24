@@ -189,29 +189,19 @@ namespace EduSearch_Information_System
                 }
             }
             return expandedQuery;
+            //System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText\n variable: queryText\n " + queryText + "\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
         }
 
         // ================================================================================================================================================================
         // ================================================================================================================================================================
 
-        public Query ParseSearchText(string queryText) {
-            // Add extended query
-            System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText\n variable: queryText\n " + queryText + "\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
-
+        public Query ParseSearchText(string queryText)
+        {
             Query parsedSearch;
-            HashSet<Term> terms = null;
             try
             {
                 queryText = queryText.ToLower();
                 parsedSearch = parser.Parse(queryText);
-                terms = new HashSet<Term>();
-                parsedSearch.ExtractTerms(terms);
-                System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText --> ExtractTerms --> foreach\n");
-                System.Console.WriteLine(terms.ToString());
-                System.Console.WriteLine("\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
-
-
-                //System.Console.WriteLine("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n method: ParseSearchText\n variable: parsedSearch\n " + parsedSearch + "\n ~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
 
             }
             catch
