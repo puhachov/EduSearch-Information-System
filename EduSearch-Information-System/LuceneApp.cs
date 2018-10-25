@@ -22,6 +22,7 @@ namespace EduSearch_Information_System
         private Lucene.Net.Index.IndexWriter writer;
         private Lucene.Net.Search.IndexSearcher searcher;
         private Lucene.Net.QueryParsers.QueryParser parser;
+        private Similarity newSimilarity;
         public string indexPath { get; set; }
         public string collectionPath { get; set; }
 
@@ -39,7 +40,7 @@ namespace EduSearch_Information_System
 
         WordNetEngine wordNetEngine;
 
-        private readonly string[] STOP_WORDS = new string[]{ "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
+        private string[] STOP_WORDS = new string[]{ "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
             "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't",
             "cannot", "could", "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few",
             "for", "from", "further", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's", "her",
@@ -59,16 +60,12 @@ namespace EduSearch_Information_System
             luceneIndexDirectory = null;
             analyzer = null;
             writer = null;
+            newSimilarity = new NewSimilarity();
             parserFields = new string[] { DOC_TITLE, DOC_AUTHOR, DOC_BIB, DOC_BODY };
             fieldWeights = new Dictionary<string, float>();
             foreach(string field in parserFields) {
                 fieldWeights.Add(field, 1);
             }            
-            cranquelIdeal.Add("001", new string[] { "184", "29", "31", "12", "51", "102", "13", "14", "15", "57", "378", "859", "185", "30", "37", "52", "142", "195", "875", "56", "66", "95", "462", "497", "858", "876", "879", "880", "486" });
-            cranquelIdeal.Add("002", new string[] { "12", "15", "184", "858", "51", "102", "202", "14", "52", "380", "746", "859", "948", "285", "390", "391", "442", "497", "643", "856", "857", "877", "864", "658", "486" });
-            cranquelIdeal.Add("23", new string[] { "900", "902", "200", "201", "601", "899", "903", "593", "199", "594", "901", "544", "597", "749", "917", "919", "1333", "634", "687", "698", "1290", "700", "704", "705", "1109", "1112", "1141", "1197", "1256", "1259", "1272", "1289", "892" });
-            cranquelIdeal.Add("157", new string[] { "273", "1105", "1106", "93", "161", "302", "122", "666", "1107", "556", "25", "1011", "19", "35", "1355", "372", "410", "456", "36", "44", "215", "626", "1151", "354", "369", "370", "421", "557", "605", "655", "657", "689", "1307", "318", "423", "1304", "160", "482", "572", "1006" });
-            cranquelIdeal.Add("219", new string[] { "1391", "666", "667", "1258", "1078", "1080", "1081", "1394", "1395", "1214", "1198", "1204", "1300", "559", "630", "662", "1107", "1213", "1191" });
 
             // Init WordNet
             // Src: https://developer.syn.co.in/tutorial/wordnet/tutorial.html
@@ -109,6 +106,7 @@ namespace EduSearch_Information_System
 
             IndexWriter.MaxFieldLength mfl = new IndexWriter.MaxFieldLength(IndexWriter.DEFAULT_MAX_FIELD_LENGTH);
             writer = new Lucene.Net.Index.IndexWriter(luceneIndexDirectory, shingleAnalyzer, true, mfl);
+            writer.SetSimilarity(newSimilarity);
 
             IndexCollection();
 
@@ -157,35 +155,18 @@ namespace EduSearch_Information_System
         public void CreateSearcher()
         {
             searcher = new IndexSearcher(luceneIndexDirectory);
+            searcher.Similarity = newSimilarity;
         }
 
         public void CreateParser()
         {
-            parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_30, parserFields, analyzer, fieldWeights);
+            parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_30, parserFields, shingleAnalyzer, fieldWeights);
         }
 
 
         public void CleanUpSearch()
         {
             searcher.Dispose();
-        }
-
-        // ================================================================================================================================================================
-        // ================================================================================================================================================================
-
-        public List<String> TokenizeQuery(String query)
-        {
-            List<String> tokens = new List<String>();
-
-            TokenStream tokenStream = analyzer.TokenStream(null, new StringReader(query));
-            tokenStream.Reset();
-            do
-            {
-                tokens.Add(tokenStream.GetAttribute<Lucene.Net.Analysis.Tokenattributes.ITermAttribute>().Term);
-            }
-            while (tokenStream.IncrementToken());
-
-            return tokens;
         }
 
         public List<String> SimpleTokenizeQuery(String query)
@@ -207,12 +188,26 @@ namespace EduSearch_Information_System
         {
             String expansion = "";
 
+
             foreach (String token in tokens)
             {
+                bool isToken = false;
+                foreach (string sw in STOP_WORDS)
+                {
+                    if (sw.Contains(token))
+                    {
+                        isToken = true;
+                    }
+                }
+                if (token == "" || token == " " || isToken == true)
+                {
+                    System.Console.WriteLine("Token: {0} : {0}", token, isToken);
+                    continue;
+                }
                 System.Console.WriteLine("\n\n~~~~~~~~~~~~~~~~~~~~~~~~ Getting synonyms from WordNet\n");
                 System.Console.WriteLine("Synonyms for token =  " + token + "\n");
 
-                expansion += token + " ";
+                expansion += token + "^5 ";
 
                 // For each token, add synonym
                 // src: https://developer.syn.co.in/api/Syn.WordNet.WordNetEngine.html
@@ -232,7 +227,7 @@ namespace EduSearch_Information_System
                         {
                             if (!expansion.Contains(noun_syn))
                             {
-                                expansion += noun_syn + ' ';
+                                expansion += noun_syn + "^1 ";
                                 System.Console.WriteLine(noun_syn);
                             }
                         }
@@ -254,7 +249,7 @@ namespace EduSearch_Information_System
                         {
                             if (!expansion.Contains(adj_syn))
                             {
-                                expansion += adj_syn + ' ';
+                                expansion += adj_syn + "^1 ";
                                 System.Console.WriteLine(adj_syn);
                             }
                         }
@@ -276,7 +271,7 @@ namespace EduSearch_Information_System
                         {
                             if (!expansion.Contains(adj_verb))
                             {
-                                expansion += adj_verb + ' ';
+                                expansion += adj_verb + "^1 ";
                                 System.Console.WriteLine(adj_verb);
                             }
                         }
@@ -298,7 +293,7 @@ namespace EduSearch_Information_System
                         {
                             if (!expansion.Contains(adj_adverb))
                             {
-                                expansion += adj_adverb + ' ';
+                                expansion += adj_adverb + "^1 ";
                                 System.Console.WriteLine(adj_adverb);
                             }
                         }
@@ -315,202 +310,24 @@ namespace EduSearch_Information_System
             }
 
             return expansion;
-        }
+        }     
 
-        public String QueryExpansion2(IEnumerable<String> tokens, Boolean checkForNoun, Boolean checkForAdj, Boolean checkForVerb, Boolean checkForAdverb)
+        public Query CreateFullPhrase(string searchText)
         {
-            String expansion = "";
-
-            foreach (String token in tokens)
+            Query parsedSearch;
+            try
             {
-                System.Console.WriteLine("\n\n~~~~~~~~~~~~~~~~~~~~~~~~ Getting synonyms from WordNet\n");
-                System.Console.WriteLine("Synonyms for token =  " + token + "\n");
-
-                expansion += token + " ";
-
-                // For each token, add synonym
-                // src: https://developer.syn.co.in/api/Syn.WordNet.WordNetEngine.html
-                SynSet synSet_noun = wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Noun);
-                SynSet synSet_adjective = wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adjective);
-                SynSet synSet_verb = wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Verb);
-                SynSet synSet_adverb = wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adverb);
-
-                var synSetList = wordNetEngine.GetSynSets(token);
-
-                System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
-                foreach (var synSet in synSetList)
-                {
-                    System.Console.WriteLine("~~~~~~~~~~~SemanticRelations~~~~~~~~~~~~~ \n\n");
-                    foreach (var r in synSet.SemanticRelations)
-                    {
-                        System.Console.WriteLine(r);
-                    }
-                    System.Console.WriteLine("~~~~~~~~~~~word~~~~~~~~~~~~~ \n\n");
-                    foreach (var word in synSet.Words)
-                    {
-                        if (!expansion.Contains(word))
-                        {
-                            expansion += word + ' ';
-                            System.Console.WriteLine(word);
-                        }
-                    }
-                }
-                System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
-            }
-
-            return expansion;
-        }
-
-        public BooleanQuery BooleanQueryExpansion(IEnumerable<String> tokens, Boolean checkForNoun, Boolean checkForAdj, Boolean checkForVerb, Boolean checkForAdverb)
-        {
-            String usedTerms = "";
-            BooleanQuery combining = new BooleanQuery();
-
-            System.Console.WriteLine("Noun: {0}, Adj: {0}, Verb: {0}, Adv: {0}", checkForNoun, checkForAdj, checkForVerb, checkForAdverb);
-
-            foreach (String token in tokens)
-            {
-                System.Console.WriteLine("\n\n~~~~~~~~~~~~~~~~~~~~~~~~ Getting synonyms from WordNet\n");
-                System.Console.WriteLine("Synonyms for token =  " + token + "\n");
-
-                usedTerms += " " + token;
-                Query mainTokenTITLE = parser.Parse(token);
-                Query mainTokenBODY = parser.Parse(token);
-                mainTokenTITLE.Boost = 5;
-                mainTokenBODY.Boost = 5;
-                combining.Add(mainTokenTITLE, Occur.SHOULD);
-                combining.Add(mainTokenBODY, Occur.SHOULD);
-
-                // For each token, add synonym
-                // src: https://developer.syn.co.in/api/Syn.WordNet.WordNetEngine.html
-                SynSet synSet_noun = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Noun);
-                SynSet synSet_adjective = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adjective);
-                SynSet synSet_verb = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Verb);
-                SynSet synSet_adverb = this.wordNetEngine.GetMostCommonSynSet(token, PartOfSpeech.Adverb);
-
-
-
-                if (checkForNoun == true)
-                {
-                    System.Console.WriteLine("~~~~~~~ Nouns\n");
-                    try
-                    {
-                        foreach (var noun_syn in synSet_noun.Words)
-                        {
-                            if (!usedTerms.Contains(noun_syn))
-                            {
-                                Query tokenTITLE = parser.Parse(noun_syn);
-                                Query tokenBODY = parser.Parse(noun_syn);
-                                tokenTITLE.Boost = 1;
-                                tokenBODY.Boost = 1;
-                                combining.Add(tokenTITLE, Occur.MUST_NOT);
-                                combining.Add(tokenBODY, Occur.MUST_NOT);
-                                usedTerms += " " + noun_syn;
-                                System.Console.WriteLine(noun_syn);
-                            }
-                        }
-                    }
-                    catch (NullReferenceException e)
-                    {
-
-                        // Noun does not contain synonym
-                    }
-                }
-
-
-                if (checkForAdj == true)
-                {
-                    System.Console.WriteLine("~~~~~~~ Adjectives\n");
-                    try
-                    {
-                        foreach (var adj_syn in synSet_adjective.Words)
-                        {
-                            if (!usedTerms.Contains(adj_syn))
-                            {
-                                Query tokenTITLE = parser.Parse(adj_syn);
-                                Query tokenBODY = parser.Parse(adj_syn);
-                                tokenTITLE.Boost = 1;
-                                tokenBODY.Boost = 1;
-                                combining.Add(tokenTITLE, Occur.MUST_NOT);
-                                combining.Add(tokenBODY, Occur.MUST_NOT);
-                                usedTerms += " " + adj_syn;
-                                System.Console.WriteLine(adj_syn);
-                            }
-                        }
-                    }
-                    catch (NullReferenceException e)
-                    {
-
-                        // Noun does not contain adjectives
-                    }
-                }
-
-
-                if (checkForVerb == true)
-                {
-                    System.Console.WriteLine("~~~~~~~ Verbs\n");
-                    try
-                    {
-                        foreach (var adj_verb in synSet_verb.Words)
-                        {
-                            if (!usedTerms.Contains(adj_verb))
-                            {
-                                Query tokenTITLE = parser.Parse(adj_verb);
-                                Query tokenBODY = parser.Parse(adj_verb);
-                                tokenTITLE.Boost = 1;
-                                tokenBODY.Boost = 1;
-                                combining.Add(tokenTITLE, Occur.MUST_NOT);
-                                combining.Add(tokenBODY, Occur.MUST_NOT);
-                                usedTerms += " " + adj_verb;
-                                System.Console.WriteLine(adj_verb);
-                            }
-                        }
-                    }
-                    catch (NullReferenceException e)
-                    {
-
-                        // Noun does not contain adjectives
-                    }
-                }
-
-
-                if (checkForAdverb == true)
-                {
-                    System.Console.WriteLine("~~~~~~~ Adverbs\n");
-                    try
-                    {
-                        foreach (var adj_adverb in synSet_adverb.Words)
-                        {
-                            if (!usedTerms.Contains(adj_adverb))
-                            {
-                                Query tokenTITLE = parser.Parse(adj_adverb);
-                                Query tokenBODY = parser.Parse(adj_adverb);
-                                tokenTITLE.Boost = 1;
-                                tokenBODY.Boost = 1;
-                                combining.Add(tokenTITLE, Occur.MUST_NOT);
-                                combining.Add(tokenBODY, Occur.MUST_NOT);
-                                usedTerms += " " + adj_adverb;
-                                System.Console.WriteLine(adj_adverb);
-                            }
-                        }
-                    }
-                    catch (NullReferenceException e)
-                    {
-
-                        // Noun does not contain adjectives
-                    }
-                }
-
-                System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~ \n\n");
+                string output = "\"";
+                output += searchText.Replace("\"", "").ToLower();
+                output += "\"";                
+                parsedSearch = parser.Parse(output);
 
             }
-
-            foreach (BooleanClause q in combining.GetClauses())
+            catch
             {
-                Console.WriteLine("Clause" + q.Query.ToString());
+                parsedSearch = null;
             }
-
-            return combining;
+            return parsedSearch;
         }
 
         public List<String> getPhrasesInString(String query)
@@ -523,11 +340,12 @@ namespace EduSearch_Information_System
             {
                 String phrase = m.ToString();
                 System.Console.WriteLine("Phrase: " + phrase);
-                phrases.Add(phrase.Replace("\"", ""));
+                phrases.Add(phrase);
             }
 
             return phrases;
         }
+
 
         // ================================================================================================================================================================
         // ================================================================================================================================================================
@@ -551,10 +369,17 @@ namespace EduSearch_Information_System
 
         public List<Dictionary<string,string>> SearchIndex(Query query, Dictionary<string,float> weights){
 
-            parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_30, parserFields, analyzer, weights);
-
+            //parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_30, parserFields, shingleAnalyzer, weights);
+            TopDocs results = null;
             //System.Console.WriteLine("Searching for " + query.ToString());
-            TopDocs results = searcher.Search(query,200);
+            try
+            {
+                results = searcher.Search(query,200);
+            }
+            catch (Exception e)
+            {
+                // invalid string
+            }
             List<Dictionary<string, string>> fullResults = new List<Dictionary<string, string>>();
 
             int docIndex = 0;

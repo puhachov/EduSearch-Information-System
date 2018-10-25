@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NewSimilarity.cs" />
     <Compile Include="SnowballAnalyzer.cs" />
     <Compile Include="StandardAnalyzer.cs" />
     <Compile Include="ShingleFilter.cs" />

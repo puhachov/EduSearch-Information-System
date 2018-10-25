@@ -24,14 +24,16 @@ class FileReadProcess
 
         string docNo = getSection(document, @".I([\s\S]+?)\.T");
         string title = getSection(document, @".T\n([\s\S]+?)\.A");
-        title = title.Replace('\n', ' ');
         string author = getSection(document, @".A\n([\s\S]+?)\.B");
         string bib = getSection(document, @".B\n([\s\S]+?)\.W");
         string body = getSection(document, @"\.W([\s\S]+)");
 
-        body = ReplaceFirstOccurrence(body,title,"");
-        body = body.Replace('\n', ' ');
+        body = ReplaceFirstOccurrence(body,title,"");        
         body = char.ToUpper(body[0]) + body.Substring(1);
+        body = body.Trim();
+
+        body = body.Replace('\n', ' ');
+        title = title.Replace('\n', ' ');
 
         documentObj.Add(DOC_ID, docNo);
         documentObj.Add(DOC_TITLE, title);

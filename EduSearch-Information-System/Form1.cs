@@ -87,7 +87,7 @@ namespace EduSearch_Information_System
             System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
 
             // Get user input
-            string searchText = txtSimpleSearch.Text.ToLower();
+            string searchText = txtSimpleSearch.Text.ToLower().Replace("\n", " ");
             
             // If user input field is not empty
             if (searchText.Length > 0)
@@ -105,20 +105,11 @@ namespace EduSearch_Information_System
                 weights.Add(DOC_BODY, (float)numBodyWeight.Value);
 
                 // If single/multi phrase search
-                if (checkPhrase.Checked)
-                {
-                    // If query expansion
-                    if (queryExpansionCB.Checked)
-                    {
-                        List<String> stringList = txtSimpleSearch.Text.Replace("\"", "").Split(' ').ToList();
-                        phraseList = luceneApp.getPhrasesInString(searchText);
-                        searchText = luceneApp.QueryExpansion(stringList.Concat(phraseList), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
-                        parsedSearch = luceneApp.ParseSearchText(searchText);
-                        searchResults = luceneApp.SearchIndex(parsedSearch, weights);
-                    }
-                    
+                if (fullPhrase.Checked)
+                {                  
+                    parsedSearch = luceneApp.CreateFullPhrase(searchText);
+                    searchResults = luceneApp.SearchIndex(parsedSearch, weights);
                 }
-
                 // If single/multi term search
                 else
                 {
@@ -126,22 +117,20 @@ namespace EduSearch_Information_System
                     if (queryExpansionCB.Checked)
                     {
                         List<String> stringList = luceneApp.SimpleTokenizeQuery(searchText);
-                        searchText = luceneApp.QueryExpansion2(stringList, checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
+                        searchText = luceneApp.QueryExpansion(stringList, checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
                         //booleanQuery = luceneApp.BooleanQueryExpansion(stringList.ToList(), checkForNoun.Checked, checkForAdj.Checked, checkForVerb.Checked, checkForAdverb.Checked);
-
+                        System.Console.WriteLine("searchText after QE" + searchText);
                         // Search
                         //searchResults = luceneApp.SearchIndex(booleanQuery, weights);
+                        parsedSearch = luceneApp.ParseSearchText(searchText);
+                        System.Console.WriteLine("parsedSearch after ParseSearchText" + parsedSearch);
+                        searchResults = luceneApp.SearchIndex(parsedSearch, weights);
+                    }
+                    else {
                         parsedSearch = luceneApp.ParseSearchText(searchText);
                         searchResults = luceneApp.SearchIndex(parsedSearch, weights);
                     }
                 }
-
-                //Query parsedSearch;
-                //parsedSearch = luceneApp.ParseSearchText(searchText);
-                //searchResults = luceneApp.SearchIndex(parsedSearch,weights);
-                //searchResults = luceneApp.SearchIndex(booleanQuery, weights);
-
-                //listPanel1.Clear();
 
                 totalResults = searchResults.Count;
                 totalPages = (totalResults / resultsPerPage) + 1;
@@ -208,6 +197,7 @@ namespace EduSearch_Information_System
                 title.Multiline = true;
                 title.BorderStyle = BorderStyle.None;
                 title.Font = new Font("Adobe Caslon Pro", 10);
+                title.ReadOnly = true;
 
                 TextBox info = new TextBox();
                 info.Text = searchResults[i][DOC_AUTHOR] + "  -  " + searchResults[i][DOC_BIB];
@@ -216,6 +206,7 @@ namespace EduSearch_Information_System
                 info.Size = new Size(infoWidth, infoHeight);
                 info.Multiline = true;
                 info.BorderStyle = BorderStyle.None;
+                info.ReadOnly = true;
 
                 TextBox textAbstract = new TextBox();
                 textAbstract.Text = Truncate(searchResults[i][DOC_BODY], 250);
@@ -226,6 +217,7 @@ namespace EduSearch_Information_System
                 textAbstract.Multiline = true;
                 textAbstract.BorderStyle = BorderStyle.None;
                 textAbstract.Font = new Font("Times New Roman", 9);
+                textAbstract.ReadOnly = true;
 
                 Button openResult = new Button();
                 openResult.Text = "Open";
@@ -266,6 +258,7 @@ namespace EduSearch_Information_System
             title.Multiline = true;
             title.BorderStyle = BorderStyle.None;
             title.Font = new Font("Adobe Caslon Pro", 10);
+            title.ReadOnly = true;
 
             TextBox author = new TextBox();
             author.Text = searchResults[resultsIndex][DOC_AUTHOR];
@@ -274,6 +267,7 @@ namespace EduSearch_Information_System
             author.Size = new Size(252, 20);
             author.Multiline = true;
             author.BorderStyle = BorderStyle.None;
+            author.ReadOnly = true;
 
             TextBox bib = new TextBox();
             bib.Text = searchResults[resultsIndex][DOC_BIB];
@@ -282,6 +276,7 @@ namespace EduSearch_Information_System
             bib.Size = new Size(252, 20);
             bib.Multiline = true;
             bib.BorderStyle = BorderStyle.None;
+            bib.ReadOnly = true;
 
             TextBox textAbstract = new TextBox();
             textAbstract.Text = searchResults[resultsIndex][DOC_BODY];
@@ -293,6 +288,7 @@ namespace EduSearch_Information_System
             textAbstract.BorderStyle = BorderStyle.None;
             textAbstract.ScrollBars = ScrollBars.Vertical;
             textAbstract.Font = new Font("Times New Roman", 9);
+            textAbstract.ReadOnly = true;
 
             docWindow.Controls.Add(title);
             docWindow.Controls.Add(author);
@@ -397,7 +393,7 @@ namespace EduSearch_Information_System
                     foreach (Dictionary<string, string> result in searchResults)
                     {
                         string paddedResult = numQueryNo.Text.PadLeft(3, '0');
-                        sw.WriteLine(String.Format("{0} Q0 {1} {2} {3} n10323546_n10305769_n8551138 \n", paddedResult, result[DOC_ID].Replace("\n", ""), resultNo.ToString(), result[DOC_RANK]));
+                        sw.WriteLine(String.Format("{0} Q0 {1} {2} {3} n10323546_n10305769_n8551138_googs \n", paddedResult, result[DOC_ID].Replace("\n", ""), resultNo.ToString(), result[DOC_RANK]));
                         resultNo++;
                     }
                 }
@@ -490,6 +486,66 @@ namespace EduSearch_Information_System
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void queryExpansionCB_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numAuthorWeight_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numBibWeight_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numTitleWeight_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numBodyWeight_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numQueryNo_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void searchInfo_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblIndexInformation_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblIndexInfoTitle_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtSimpleSearch_TextChanged(object sender, EventArgs e)
         {
 
         }

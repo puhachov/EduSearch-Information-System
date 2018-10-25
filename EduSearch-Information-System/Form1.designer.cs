@@ -41,6 +41,8 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
             this.tabSimpleSearch = new System.Windows.Forms.TabPage();
+            this.checkForAdverb = new System.Windows.Forms.CheckBox();
+            this.checkForVerb = new System.Windows.Forms.CheckBox();
             this.checkForAdj = new System.Windows.Forms.CheckBox();
             this.checkForNoun = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -57,7 +59,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.numQueryNo = new System.Windows.Forms.NumericUpDown();
             this.searchInfo = new System.Windows.Forms.TextBox();
-            this.checkPhrase = new System.Windows.Forms.CheckBox();
+            this.fullPhrase = new System.Windows.Forms.CheckBox();
             this.lblIndexInformation = new System.Windows.Forms.Label();
             this.lblIndexInfoTitle = new System.Windows.Forms.Label();
             this.lblSearchTitle = new System.Windows.Forms.Label();
@@ -72,8 +74,7 @@
             this.txtSimpleSearch = new System.Windows.Forms.TextBox();
             this.listPanel1 = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.checkForVerb = new System.Windows.Forms.CheckBox();
-            this.checkForAdverb = new System.Windows.Forms.CheckBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBoxIndexSelection.SuspendLayout();
             this.tabSimpleSearch.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numAuthorWeight)).BeginInit();
@@ -177,6 +178,7 @@
             // 
             // tabSimpleSearch
             // 
+            this.tabSimpleSearch.Controls.Add(this.textBox1);
             this.tabSimpleSearch.Controls.Add(this.checkForAdverb);
             this.tabSimpleSearch.Controls.Add(this.checkForVerb);
             this.tabSimpleSearch.Controls.Add(this.checkForAdj);
@@ -195,7 +197,7 @@
             this.tabSimpleSearch.Controls.Add(this.label1);
             this.tabSimpleSearch.Controls.Add(this.numQueryNo);
             this.tabSimpleSearch.Controls.Add(this.searchInfo);
-            this.tabSimpleSearch.Controls.Add(this.checkPhrase);
+            this.tabSimpleSearch.Controls.Add(this.fullPhrase);
             this.tabSimpleSearch.Controls.Add(this.lblIndexInformation);
             this.tabSimpleSearch.Controls.Add(this.lblIndexInfoTitle);
             this.tabSimpleSearch.Controls.Add(this.lblSearchTitle);
@@ -218,10 +220,32 @@
             this.tabSimpleSearch.UseVisualStyleBackColor = true;
             this.tabSimpleSearch.Click += new System.EventHandler(this.tabSimpleSearch_Click);
             // 
+            // checkForAdverb
+            // 
+            this.checkForAdverb.AutoSize = true;
+            this.checkForAdverb.Location = new System.Drawing.Point(235, 151);
+            this.checkForAdverb.Name = "checkForAdverb";
+            this.checkForAdverb.Size = new System.Drawing.Size(65, 17);
+            this.checkForAdverb.TabIndex = 38;
+            this.checkForAdverb.Text = "Adverbs";
+            this.checkForAdverb.UseVisualStyleBackColor = true;
+            this.checkForAdverb.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // checkForVerb
+            // 
+            this.checkForVerb.AutoSize = true;
+            this.checkForVerb.Location = new System.Drawing.Point(154, 151);
+            this.checkForVerb.Name = "checkForVerb";
+            this.checkForVerb.Size = new System.Drawing.Size(53, 17);
+            this.checkForVerb.TabIndex = 38;
+            this.checkForVerb.Text = "Verbs";
+            this.checkForVerb.UseVisualStyleBackColor = true;
+            this.checkForVerb.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // checkForAdj
             // 
             this.checkForAdj.AutoSize = true;
-            this.checkForAdj.Location = new System.Drawing.Point(73, 134);
+            this.checkForAdj.Location = new System.Drawing.Point(73, 151);
             this.checkForAdj.Name = "checkForAdj";
             this.checkForAdj.Size = new System.Drawing.Size(75, 17);
             this.checkForAdj.TabIndex = 38;
@@ -232,7 +256,7 @@
             // checkForNoun
             // 
             this.checkForNoun.AutoSize = true;
-            this.checkForNoun.Location = new System.Drawing.Point(15, 134);
+            this.checkForNoun.Location = new System.Drawing.Point(15, 151);
             this.checkForNoun.Name = "checkForNoun";
             this.checkForNoun.Size = new System.Drawing.Size(57, 17);
             this.checkForNoun.TabIndex = 38;
@@ -244,7 +268,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(12, 118);
+            this.label7.Location = new System.Drawing.Point(12, 135);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(352, 13);
             this.label7.TabIndex = 37;
@@ -260,11 +284,12 @@
             this.queryExpansionCB.TabIndex = 36;
             this.queryExpansionCB.Text = "Use query expansion";
             this.queryExpansionCB.UseVisualStyleBackColor = true;
+            this.queryExpansionCB.CheckedChanged += new System.EventHandler(this.queryExpansionCB_CheckedChanged);
             // 
             // numAuthorWeight
             // 
             this.numAuthorWeight.DecimalPlaces = 2;
-            this.numAuthorWeight.Location = new System.Drawing.Point(302, 199);
+            this.numAuthorWeight.Location = new System.Drawing.Point(302, 254);
             this.numAuthorWeight.Minimum = new decimal(new int[] {
             11,
             0,
@@ -278,11 +303,12 @@
             0,
             0,
             0});
+            this.numAuthorWeight.ValueChanged += new System.EventHandler(this.numAuthorWeight_ValueChanged);
             // 
             // numBibWeight
             // 
             this.numBibWeight.DecimalPlaces = 2;
-            this.numBibWeight.Location = new System.Drawing.Point(302, 236);
+            this.numBibWeight.Location = new System.Drawing.Point(302, 291);
             this.numBibWeight.Minimum = new decimal(new int[] {
             11,
             0,
@@ -296,11 +322,12 @@
             0,
             0,
             0});
+            this.numBibWeight.ValueChanged += new System.EventHandler(this.numBibWeight_ValueChanged);
             // 
             // numTitleWeight
             // 
             this.numTitleWeight.DecimalPlaces = 2;
-            this.numTitleWeight.Location = new System.Drawing.Point(200, 236);
+            this.numTitleWeight.Location = new System.Drawing.Point(200, 291);
             this.numTitleWeight.Minimum = new decimal(new int[] {
             11,
             0,
@@ -314,11 +341,12 @@
             0,
             0,
             0});
+            this.numTitleWeight.ValueChanged += new System.EventHandler(this.numTitleWeight_ValueChanged);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(163, 238);
+            this.label6.Location = new System.Drawing.Point(163, 293);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(27, 13);
             this.label6.TabIndex = 32;
@@ -328,7 +356,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(258, 238);
+            this.label5.Location = new System.Drawing.Point(258, 293);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(32, 13);
             this.label5.TabIndex = 31;
@@ -338,25 +366,27 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(258, 201);
+            this.label4.Location = new System.Drawing.Point(258, 256);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(38, 13);
             this.label4.TabIndex = 30;
             this.label4.Text = "Author";
+            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(163, 201);
+            this.label3.Location = new System.Drawing.Point(163, 256);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(31, 13);
             this.label3.TabIndex = 29;
             this.label3.Text = "Body";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(238, 176);
+            this.label2.Location = new System.Drawing.Point(238, 231);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(71, 13);
             this.label2.TabIndex = 28;
@@ -366,7 +396,7 @@
             // numBodyWeight
             // 
             this.numBodyWeight.DecimalPlaces = 2;
-            this.numBodyWeight.Location = new System.Drawing.Point(200, 199);
+            this.numBodyWeight.Location = new System.Drawing.Point(200, 254);
             this.numBodyWeight.Minimum = new decimal(new int[] {
             11,
             0,
@@ -380,11 +410,12 @@
             0,
             0,
             0});
+            this.numBodyWeight.ValueChanged += new System.EventHandler(this.numBodyWeight_ValueChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 201);
+            this.label1.Location = new System.Drawing.Point(12, 256);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(52, 13);
             this.label1.TabIndex = 23;
@@ -393,48 +424,52 @@
             // 
             // numQueryNo
             // 
-            this.numQueryNo.Location = new System.Drawing.Point(69, 199);
+            this.numQueryNo.Location = new System.Drawing.Point(69, 254);
             this.numQueryNo.Name = "numQueryNo";
             this.numQueryNo.Size = new System.Drawing.Size(61, 20);
             this.numQueryNo.TabIndex = 22;
+            this.numQueryNo.ValueChanged += new System.EventHandler(this.numQueryNo_ValueChanged);
             // 
             // searchInfo
             // 
             this.searchInfo.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.searchInfo.Location = new System.Drawing.Point(20, 314);
+            this.searchInfo.Location = new System.Drawing.Point(20, 369);
             this.searchInfo.Multiline = true;
             this.searchInfo.Name = "searchInfo";
             this.searchInfo.Size = new System.Drawing.Size(339, 89);
             this.searchInfo.TabIndex = 21;
+            this.searchInfo.TextChanged += new System.EventHandler(this.searchInfo_TextChanged);
             // 
-            // checkPhrase
+            // fullPhrase
             // 
-            this.checkPhrase.AutoSize = true;
-            this.checkPhrase.Location = new System.Drawing.Point(15, 80);
-            this.checkPhrase.Name = "checkPhrase";
-            this.checkPhrase.Size = new System.Drawing.Size(131, 17);
-            this.checkPhrase.TabIndex = 20;
-            this.checkPhrase.Text = "Search for full phrases";
-            this.checkPhrase.UseVisualStyleBackColor = true;
-            this.checkPhrase.CheckedChanged += new System.EventHandler(this.checkPhrase_CheckedChanged);
+            this.fullPhrase.AutoSize = true;
+            this.fullPhrase.Location = new System.Drawing.Point(15, 80);
+            this.fullPhrase.Name = "fullPhrase";
+            this.fullPhrase.Size = new System.Drawing.Size(126, 17);
+            this.fullPhrase.TabIndex = 20;
+            this.fullPhrase.Text = "Search for full phrase";
+            this.fullPhrase.UseVisualStyleBackColor = true;
+            this.fullPhrase.CheckedChanged += new System.EventHandler(this.checkPhrase_CheckedChanged);
             // 
             // lblIndexInformation
             // 
             this.lblIndexInformation.AutoSize = true;
-            this.lblIndexInformation.Location = new System.Drawing.Point(17, 447);
+            this.lblIndexInformation.Location = new System.Drawing.Point(17, 502);
             this.lblIndexInformation.Name = "lblIndexInformation";
             this.lblIndexInformation.Size = new System.Drawing.Size(0, 13);
             this.lblIndexInformation.TabIndex = 18;
+            this.lblIndexInformation.Click += new System.EventHandler(this.lblIndexInformation_Click);
             // 
             // lblIndexInfoTitle
             // 
             this.lblIndexInfoTitle.AutoSize = true;
             this.lblIndexInfoTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblIndexInfoTitle.Location = new System.Drawing.Point(16, 406);
+            this.lblIndexInfoTitle.Location = new System.Drawing.Point(16, 461);
             this.lblIndexInfoTitle.Name = "lblIndexInfoTitle";
             this.lblIndexInfoTitle.Size = new System.Drawing.Size(171, 24);
             this.lblIndexInfoTitle.TabIndex = 17;
             this.lblIndexInfoTitle.Text = "Index Information";
+            this.lblIndexInfoTitle.Click += new System.EventHandler(this.lblIndexInfoTitle_Click);
             // 
             // lblSearchTitle
             // 
@@ -511,7 +546,7 @@
             // lblTermDisplayTitle
             // 
             this.lblTermDisplayTitle.AutoSize = true;
-            this.lblTermDisplayTitle.Location = new System.Drawing.Point(17, 314);
+            this.lblTermDisplayTitle.Location = new System.Drawing.Point(17, 369);
             this.lblTermDisplayTitle.Name = "lblTermDisplayTitle";
             this.lblTermDisplayTitle.Size = new System.Drawing.Size(82, 13);
             this.lblTermDisplayTitle.TabIndex = 3;
@@ -520,7 +555,7 @@
             // 
             // btnSimpleSearch
             // 
-            this.btnSimpleSearch.Location = new System.Drawing.Point(185, 264);
+            this.btnSimpleSearch.Location = new System.Drawing.Point(185, 319);
             this.btnSimpleSearch.Name = "btnSimpleSearch";
             this.btnSimpleSearch.Size = new System.Drawing.Size(174, 24);
             this.btnSimpleSearch.TabIndex = 1;
@@ -530,10 +565,12 @@
             // 
             // txtSimpleSearch
             // 
-            this.txtSimpleSearch.Location = new System.Drawing.Point(15, 153);
+            this.txtSimpleSearch.Location = new System.Drawing.Point(15, 170);
+            this.txtSimpleSearch.Multiline = true;
             this.txtSimpleSearch.Name = "txtSimpleSearch";
-            this.txtSimpleSearch.Size = new System.Drawing.Size(339, 20);
+            this.txtSimpleSearch.Size = new System.Drawing.Size(339, 58);
             this.txtSimpleSearch.TabIndex = 0;
+            this.txtSimpleSearch.TextChanged += new System.EventHandler(this.txtSimpleSearch_TextChanged);
             // 
             // listPanel1
             // 
@@ -554,27 +591,16 @@
             this.tabControl1.Visible = false;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
-            // checkForVerb
+            // textBox1
             // 
-            this.checkForVerb.AutoSize = true;
-            this.checkForVerb.Location = new System.Drawing.Point(154, 134);
-            this.checkForVerb.Name = "checkForVerb";
-            this.checkForVerb.Size = new System.Drawing.Size(53, 17);
-            this.checkForVerb.TabIndex = 38;
-            this.checkForVerb.Text = "Verbs";
-            this.checkForVerb.UseVisualStyleBackColor = true;
-            this.checkForVerb.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
-            // checkForAdverb
-            // 
-            this.checkForAdverb.AutoSize = true;
-            this.checkForAdverb.Location = new System.Drawing.Point(235, 134);
-            this.checkForAdverb.Name = "checkForAdverb";
-            this.checkForAdverb.Size = new System.Drawing.Size(65, 17);
-            this.checkForAdverb.TabIndex = 38;
-            this.checkForAdverb.Text = "Adverbs";
-            this.checkForAdverb.UseVisualStyleBackColor = true;
-            this.checkForAdverb.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox1.Location = new System.Drawing.Point(191, 80);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(163, 52);
+            this.textBox1.TabIndex = 40;
+            this.textBox1.Text = " Enclose each phrase within double quotation marks to search for multiple phrase " +
+    "queries";
             // 
             // Form1
             // 
@@ -628,7 +654,7 @@
         private System.Windows.Forms.TextBox txtSimpleSearch;
         private System.Windows.Forms.Panel listPanel1;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.CheckBox checkPhrase;
+        private System.Windows.Forms.CheckBox fullPhrase;
         private System.Windows.Forms.TextBox searchInfo;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
@@ -647,6 +673,7 @@
         private System.Windows.Forms.CheckBox checkForAdj;
         private System.Windows.Forms.CheckBox checkForAdverb;
         private System.Windows.Forms.CheckBox checkForVerb;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 
